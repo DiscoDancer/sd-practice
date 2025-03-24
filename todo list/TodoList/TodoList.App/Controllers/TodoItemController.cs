@@ -14,53 +14,53 @@ public class TodoItemController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<TodoItem>> Get(long id)
+    public async Task<ActionResult<TodoItem>> GetAsync(long id)
     {
         var item = await _repository.GetAsync(id);
         if (item is null)
         {
             return NotFound();
         }
-        return item;
+        return Ok(item);
     }
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyCollection<TodoItem>>> GetAll()
+    public async Task<ActionResult<IReadOnlyCollection<TodoItem>>> GetAllAsync()
     {
         var items = await _repository.GetAllAsync();
         return Ok(items);
     }
 
     [HttpPost]
-    public async Task<ActionResult> Add(TodoItem item)
+    public async Task<ActionResult> AddAsync(TodoItem item)
     {
         var isAdded = await _repository.AddAsync(item);
         if (!isAdded)
         {
             return BadRequest();
         }
-        return Ok();
+        return CreatedAtAction(nameof(GetAsync), new { id = item.Id }, item);
     }
 
     [HttpPut]
-    public async Task<ActionResult> Update(TodoItem item)
+    public async Task<ActionResult> UpdateAsync(TodoItem item)
     {
         var isUpdated = await _repository.UpdateAsync(item);
         if (!isUpdated)
         {
             return BadRequest();
         }
-        return Ok();
+        return NoContent();
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(long id)
+    public async Task<ActionResult> DeleteAsync(long id)
     {
         var isDeleted = await _repository.DeleteAsync(id);
         if (!isDeleted)
         {
-            return NotFound();
+            return BadRequest();
         }
-        return Ok();
+        return NoContent();
     }
 }
