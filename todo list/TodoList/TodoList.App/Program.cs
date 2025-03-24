@@ -1,3 +1,6 @@
+using TodoList.Domain;
+using TodoList.Persistence;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,6 +10,9 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
+builder.Services.AddSingleton<ITodoItemRepository, InMemoryTodoItemRepository>();
 
 var app = builder.Build();
 
