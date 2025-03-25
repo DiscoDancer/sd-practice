@@ -1,5 +1,6 @@
 using TodoList.Domain;
 using TodoList.Persistence;
+using TodoList.Persistence.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +13,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-builder.Services.AddSingleton<ITodoItemRepository, InMemoryTodoItemRepository>();
+builder.Services.AddDbContext<MasterContext>();
+builder.Services.AddScoped<ITodoItemRepository, SqlServerTodoItemRepository>();
 
 var app = builder.Build();
 
