@@ -1,6 +1,33 @@
 @TodoList.App_HostAddress = http://localhost:5012
 
-GET {{TodoList.App_HostAddress}}/weatherforecast/
+### Get all Todo items
+GET {{TodoList.App_HostAddress}}/api/todoitem
 Accept: application/json
 
-###
+### Get a specific Todo item by ID
+GET {{TodoList.App_HostAddress}}/api/todoitem/1
+Accept: application/json
+
+### Add a new Todo item
+POST {{TodoList.App_HostAddress}}/api/todoitem
+Content-Type: application/json
+
+{
+  "id": 1,
+  "name": "Sample Todo",
+  "isComplete": false
+}
+
+### Update an existing Todo item
+PUT {{TodoList.App_HostAddress}}/api/todoitem
+Content-Type: application/json
+
+{
+  "id": 1,
+  "name": "Updated Todo",
+  "isComplete": true
+}
+
+### Delete a Todo item by ID
+DELETE {{TodoList.App_HostAddress}}/api/todoitem/1
+Accept: application/json
