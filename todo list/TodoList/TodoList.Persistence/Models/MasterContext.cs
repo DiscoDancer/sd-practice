@@ -25,11 +25,10 @@ public partial class MasterContext : DbContext
     {
         modelBuilder.Entity<TodoItem>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__TodoItem__3214EC072CCEF5AB");
+            entity.HasKey(e => e.Id).HasName("PK__TodoItem__3214EC079273C351");
 
             entity.ToTable("TodoItem");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Title).HasMaxLength(255);
         });
 

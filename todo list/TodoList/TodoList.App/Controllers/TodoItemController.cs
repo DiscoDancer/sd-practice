@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TodoList.App.Dtos;
 using TodoList.Domain;
 
 namespace TodoList.App.Controllers;
@@ -32,14 +33,14 @@ public class TodoItemController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> AddAsync(TodoItem item)
+    public async Task<ActionResult> AddAsync(AddAsyncInput input)
     {
-        var isAdded = await _repository.AddAsync(item);
-        if (!isAdded)
+        var idOrNull = await _repository.AddAsync(input.Title, input.IsDone);
+        if (idOrNull == null)
         {
             return BadRequest();
         }
-        return CreatedAtAction(nameof(GetAsync), new { id = item.Id }, item);
+        return CreatedAtAction(nameof(GetAsync), new { id = idOrNull.Value }, item);
     }
 
     [HttpPut]

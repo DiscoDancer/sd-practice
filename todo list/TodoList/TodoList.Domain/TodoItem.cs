@@ -21,4 +21,9 @@ public sealed class TodoItem
     {
         return HashCode.Combine(Id, Title, IsDone, CreatedAt);
     }
+
+    public static bool IsContentEqual(TodoItem a, TodoItem b)
+    {
+        return a.Title == b.Title && a.IsDone == b.IsDone;
+    }
 }

@@ -2,8 +2,10 @@
 
 namespace TodoList.Persistence;
 
-public sealed class InMemoryTodoItemRepository: ITodoItemRepository
+public sealed class InMemoryTodoItemRepository : ITodoItemRepository
 {
+    private static long _id = 1;
+
     private readonly List<TodoItem> _items = [];
 
     public Task<TodoItem?> GetAsync(long id)
@@ -17,10 +19,17 @@ public sealed class InMemoryTodoItemRepository: ITodoItemRepository
         return Task.FromResult(readOnlyItems);
     }
 
-    public Task<bool> AddAsync(TodoItem item)
+    public Task<long?> AddAsync(string title, bool isDone)
     {
-        _items.Add(item);
-        return Task.FromResult(true);
+        _items.Add(new TodoItem
+        {
+            CreatedAt = DateTime.UtcNow,
+            Title = title,
+            IsDone = isDone,
+            Id = ++_id,
+        });
+
+        return Task.FromResult((long?)_id);
     }
 
     public async Task<bool> UpdateAsync(TodoItem item)
@@ -31,7 +40,15 @@ public sealed class InMemoryTodoItemRepository: ITodoItemRepository
             return false;
         }
 
-        return await AddAsync(item);
+        _items.Add(new TodoItem
+        {
+            CreatedAt = DateTime.UtcNow,
+            Title = item.Title,
+            IsDone = item.IsDone,
+            Id = item.Id,
+        });
+
+        return true;
     }
 
     public async Task<bool> DeleteAsync(long id)

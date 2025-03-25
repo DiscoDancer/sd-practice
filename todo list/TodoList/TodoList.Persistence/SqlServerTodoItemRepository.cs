@@ -35,21 +35,27 @@ public sealed class SqlServerTodoItemRepository(MasterContext dbContext) : ITodo
         }).ToList().AsReadOnly();
     }
 
-    public async Task<bool> AddAsync(Domain.TodoItem item)
+    public async Task<long?> AddAsync(string title, bool isDone)
     {
         var todoItem = new Models.TodoItem
         {
-            Id = item.Id,
-            Title = item.Title,
-            IsDone = item.IsDone,
-            CreatedAt = item.CreatedAt
+            // sql server should deal with it
+            Id = -1,
+            Title = title,
+            IsDone = isDone,
+            CreatedAt = DateTime.UtcNow,
         };
 
-        await dbContext.TodoItems.AddAsync(todoItem);
+        var result = await dbContext.TodoItems.AddAsync(todoItem);
 
         var changes = await dbContext.SaveChangesAsync();
 
-        return changes > 0;
+        if (changes == 0)
+        {
+            return null;
+        }
+
+        return result.Entity.Id;
     }
 
     public async Task<bool> UpdateAsync(Domain.TodoItem item)

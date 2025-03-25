@@ -16,13 +16,16 @@ public class InMemoryTodoItemRepositoryTests
             IsDone = false,
             Title = "DoSomething"
         };
-        await repository.AddAsync(item);
+        await repository.AddAsync("DoSomething", false);
 
         // Act
         var result = await repository.GetAsync(1);
 
         // Assert
-        Assert.Equal(item, result);
+        Assert.NotNull(result);
+        Assert.True(TodoItem.IsContentEqual(item, result));
+        Assert.True(result.Id > 0);
+        Assert.True(result.CreatedAt != DateTime.MinValue);
     }
 
     [Fact]
