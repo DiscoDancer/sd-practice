@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using TodoList.Domain;
 using TodoList.Persistence;
 using TodoList.Persistence.Models;
@@ -12,8 +13,10 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddDbContext<MasterContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
 
-builder.Services.AddDbContext<MasterContext>();
+
 builder.Services.AddScoped<ITodoItemRepository, SqlServerTodoItemRepository>();
 
 var app = builder.Build();
