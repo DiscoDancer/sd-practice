@@ -35,12 +35,10 @@ public sealed class SqlServerTodoItemRepository(MasterContext dbContext) : ITodo
         }).ToList().AsReadOnly();
     }
 
-    public async Task<long?> AddAsync(string title, bool isDone)
+    public async Task<Domain.TodoItem> AddAsync(string title, bool isDone)
     {
         var todoItem = new Models.TodoItem
         {
-            // sql server should deal with it
-            Id = -1,
             Title = title,
             IsDone = isDone,
             CreatedAt = DateTime.UtcNow,
@@ -52,23 +50,34 @@ public sealed class SqlServerTodoItemRepository(MasterContext dbContext) : ITodo
 
         if (changes == 0)
         {
-            return null;
+            throw new Exception("Failed to save todo item");
         }
 
-        return result.Entity.Id;
+        return new Domain.TodoItem
+        {
+            CreatedAt = result.Entity.CreatedAt,
+            Id = result.Entity.Id,
+            IsDone = result.Entity.IsDone,
+            Title = result.Entity.Title
+        };
     }
 
-    public async Task<bool> UpdateAsync(Domain.TodoItem item)
+    public async Task<bool> UpdateAsync(long id, string? title, bool? isDone)
     {
-        var todoItem = await dbContext.TodoItems.FindAsync(item.Id);
+        var todoItem = await dbContext.TodoItems.FindAsync(id);
         if (todoItem is null)
         {
             return false;
         }
 
-        todoItem.Title = item.Title;
-        todoItem.IsDone = item.IsDone;
-        todoItem.CreatedAt = item.CreatedAt;
+        if (title is not null)
+        {
+            todoItem.Title = title;
+        }
+        if (isDone is not null)
+        {
+            todoItem.IsDone = isDone.Value;
+        }
 
         var changes = await dbContext.SaveChangesAsync();
 
@@ -84,6 +93,20 @@ public sealed class SqlServerTodoItemRepository(MasterContext dbContext) : ITodo
         }
 
         dbContext.TodoItems.Remove(todoItem);
+        var changes = await dbContext.SaveChangesAsync();
+
+        return changes > 0;
+    }
+
+    public async Task<bool> DeleteAllAsync()
+    {
+        var todoItems = await dbContext.TodoItems.ToListAsync();
+        if (!todoItems.Any())
+        {
+            return false;
+        }
+
+        dbContext.TodoItems.RemoveRange(todoItems);
         var changes = await dbContext.SaveChangesAsync();
 
         return changes > 0;

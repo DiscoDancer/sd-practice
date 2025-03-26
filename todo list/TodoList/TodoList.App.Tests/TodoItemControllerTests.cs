@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using TodoList.App.Controllers;
+using TodoList.App.Dtos;
 using TodoList.Domain;
 
 namespace TodoList.App.Tests;
@@ -74,10 +75,14 @@ public class TodoItemControllerTests
     {
         // Arrange
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
-        _mockService.Setup(service => service.AddAsync(todoItem)).ReturnsAsync(true);
+        _mockService.Setup(service => service.AddAsync(todoItem.Title, todoItem.IsDone)).ReturnsAsync(todoItem);
 
         // Act
-        var result = await _controller.AddAsync(todoItem);
+        var result = await _controller.AddAsync(new AddInput
+        {
+            IsDone = todoItem.IsDone,
+            Title = todoItem.Title
+        });
 
         // Assert
         var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result);
@@ -86,20 +91,6 @@ public class TodoItemControllerTests
         Assert.Equal(todoItem.Title, returnValue.Title);
         Assert.Equal(todoItem.CreatedAt, returnValue.CreatedAt);
         Assert.Equal(todoItem.IsDone, returnValue.IsDone);
-    }
-
-    [Fact]
-    public async Task AddTodoItem_ReturnsBadRequest()
-    {
-        // Arrange
-        var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
-        _mockService.Setup(service => service.AddAsync(todoItem)).ReturnsAsync(false);
-
-        // Act
-        var result = await _controller.AddAsync(todoItem);
-
-        // Assert
-        Assert.IsType<BadRequestResult>(result);
     }
 
     [Fact]
