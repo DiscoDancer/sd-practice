@@ -26,7 +26,7 @@ public class TodoItemControllerTests
         _mockService.Setup(service => service.GetAllAsync()).ReturnsAsync(new List<TodoItem> { todoItem });
 
         // Act
-        var result = await _controller.GetAllAsync();
+        var result = await _controller.GetAll();
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result.Result);
@@ -46,7 +46,7 @@ public class TodoItemControllerTests
         _mockService.Setup(service => service.GetAsync(1)).ReturnsAsync(todoItem);
 
         // Act
-        var result = await _controller.GetAsync(1);
+        var result = await _controller.Get(1);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result.Result);
@@ -64,7 +64,7 @@ public class TodoItemControllerTests
         _mockService.Setup(service => service.GetAsync(1)).ReturnsAsync((TodoItem?)null);
 
         // Act
-        var result = await _controller.GetAsync(1);
+        var result = await _controller.Get(1);
 
         // Assert
         Assert.IsType<NotFoundResult>(result.Result);
@@ -78,7 +78,7 @@ public class TodoItemControllerTests
         _mockService.Setup(service => service.AddAsync(todoItem.Title, todoItem.IsDone)).ReturnsAsync(todoItem);
 
         // Act
-        var result = await _controller.AddAsync(new AddInput
+        var result = await _controller.Add(new AddInput
         {
             IsDone = todoItem.IsDone,
             Title = todoItem.Title
@@ -98,10 +98,14 @@ public class TodoItemControllerTests
     {
         // Arrange
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
-        _mockService.Setup(service => service.UpdateAsync(todoItem)).ReturnsAsync(true);
+        _mockService.Setup(service => service.UpdateAsync(todoItem.Id, todoItem.Title, todoItem.IsDone)).ReturnsAsync(true);
 
         // Act
-        var result = await _controller.UpdateAsync(todoItem);
+        var result = await _controller.Update(todoItem.Id, new UpdateInput
+        {
+            IsDone = todoItem.IsDone,
+            Title = todoItem.Title,
+        });
 
         // Assert
         Assert.IsType<NoContentResult>(result);
@@ -112,10 +116,14 @@ public class TodoItemControllerTests
     {
         // Arrange
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
-        _mockService.Setup(service => service.UpdateAsync(todoItem)).ReturnsAsync(false);
+        _mockService.Setup(service => service.UpdateAsync(todoItem.Id, todoItem.Title, todoItem.IsDone)).ReturnsAsync(false);
 
         // Act
-        var result = await _controller.UpdateAsync(todoItem);
+        var result = await _controller.Update(todoItem.Id, new UpdateInput
+        {
+            IsDone = todoItem.IsDone,
+            Title = todoItem.Title,
+        });
 
         // Assert
         Assert.IsType<BadRequestResult>(result);
@@ -128,7 +136,7 @@ public class TodoItemControllerTests
         _mockService.Setup(service => service.DeleteAsync(1)).ReturnsAsync(true);
 
         // Act
-        var result = await _controller.DeleteAsync(1);
+        var result = await _controller.Delete(1);
 
         // Assert
         Assert.IsType<NoContentResult>(result);
@@ -141,8 +149,30 @@ public class TodoItemControllerTests
         _mockService.Setup(service => service.DeleteAsync(1)).ReturnsAsync(false);
 
         // Act
-        var result = await _controller.DeleteAsync(1);
+        var result = await _controller.Delete(1);
 
+        // Assert
+        Assert.IsType<BadRequestResult>(result);
+    }
+
+    [Fact]
+    public async Task DeleteAllTodoItems_ReturnsNoContentResult()
+    {
+        // Arrange
+        _mockService.Setup(service => service.DeleteAllAsync()).ReturnsAsync(true);
+        // Act
+        var result = await _controller.DeleteAll();
+        // Assert
+        Assert.IsType<NoContentResult>(result);
+    }
+
+    [Fact]
+    public async Task DeleteAllTodoItems_ReturnsBadRequest_WhenNoTodoItems()
+    {
+        // Arrange
+        _mockService.Setup(service => service.DeleteAllAsync()).ReturnsAsync(false);
+        // Act
+        var result = await _controller.DeleteAll();
         // Assert
         Assert.IsType<BadRequestResult>(result);
     }
