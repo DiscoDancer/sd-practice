@@ -26,4 +26,9 @@ RUN dotnet publish "./TodoList.App.csproj" -c $BUILD_CONFIGURATION -o /app/publi
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+
+# to use appsettings.Docker.json
+ENV ASPNETCORE_ENVIRONMENT=Docker
+
 ENTRYPOINT ["dotnet", "TodoList.App.dll"]
