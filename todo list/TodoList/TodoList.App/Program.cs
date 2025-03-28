@@ -21,13 +21,9 @@ builder.Services.AddScoped<ITodoItemRepository, SqlServerTodoItemRepository>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.UseSwagger();
-    app.UseSwaggerUI(); // This adds the Swagger UI at /swagger
-}
+app.MapOpenApi();
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.MapControllers();
 
