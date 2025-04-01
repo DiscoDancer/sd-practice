@@ -1,4 +1,5 @@
-﻿using TodoList.Client;
+﻿using TodoList.App.Dtos;
+using TodoList.Client;
 
 namespace TodoList.ConsoleApp;
 
@@ -11,8 +12,19 @@ public static class Program
 
         var crudClient = new CrudClient(client);
 
-        var todoItems = await crudClient.GetTodoItemAsync(8);
 
-        Console.WriteLine(todoItems);
+        await crudClient.DeleteAllTodoItemsAsync();
+        var result = await crudClient.GetTodoItemsAsync();
+        //var result = await crudClient.CreateTodoItemAsync(new AddInput
+        //{
+        //    IsDone = true,
+        //    Title = "Test"
+        //});
+
+
+        foreach (var item in result)
+        {
+            Console.WriteLine(item);
+        }
     }
 }
