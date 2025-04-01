@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using TodoList.App.Middlewares;
 using TodoList.Domain;
 using TodoList.Persistence;
 using TodoList.Persistence.Models;
@@ -24,6 +25,11 @@ var app = builder.Build();
 app.MapOpenApi();
 app.UseSwagger();
 app.UseSwaggerUI();
+
+if (app.Environment.EnvironmentName.Equals("Docker"))
+{
+    app.UseMiddleware<ContainerIdHeaderMiddleware>();
+}
 
 app.MapControllers();
 
