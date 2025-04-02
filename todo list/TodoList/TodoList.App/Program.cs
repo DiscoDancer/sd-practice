@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Metrics;
+using TodoList.App.Metrics;
 using TodoList.App.Middlewares;
 using TodoList.Domain;
 using TodoList.Persistence;
@@ -22,6 +24,26 @@ builder.Services.AddDbContext<MasterContext>(options =>
 
 builder.Services.AddScoped<ITodoItemRepository, SqlServerTodoItemRepository>();
 
+builder.Services.AddSingleton<ITodoItemMetrics, TodoItemMetrics>();
+
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(providerBuilder =>
+    {
+        providerBuilder.AddPrometheusExporter();
+
+        providerBuilder.AddMeter("Microsoft.AspNetCore.Hosting",
+            "Microsoft.AspNetCore.Server.Kestrel");
+        providerBuilder.AddView("http.server.request.duration",
+            new ExplicitBucketHistogramConfiguration
+            {
+                Boundaries =
+                [
+                    0, 0.005, 0.01, 0.025, 0.05,
+                    0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10
+                ]
+            });
+    });
+
 var app = builder.Build();
 
 app.MapOpenApi();
@@ -41,6 +63,7 @@ app.MapGet("/", context =>
     return Task.CompletedTask;
 });
 
-app.MapHealthChecks("/healthz");
+app.MapHealthChecks("/healthz").DisableHttpMetrics();
+app.MapPrometheusScrapingEndpoint();
 
 app.Run();
