@@ -14,6 +14,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddHealthChecks().AddDbContextCheck<MasterContext>();
+
 builder.Services.AddDbContext<MasterContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
 
@@ -38,5 +40,7 @@ app.MapGet("/", context =>
     context.Response.Redirect("/swagger");
     return Task.CompletedTask;
 });
+
+app.MapHealthChecks("/healthz");
 
 app.Run();
