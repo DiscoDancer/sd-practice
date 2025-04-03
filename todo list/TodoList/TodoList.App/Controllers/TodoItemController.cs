@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TodoList.App.Dtos;
-using TodoList.App.Metrics;
 using TodoList.Domain;
 
 namespace TodoList.App.Controllers;
@@ -9,7 +8,7 @@ namespace TodoList.App.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class TodoItemController(ITodoItemRepository repository, ITodoItemMetrics todoItemMetrics)
+public class TodoItemController(ITodoItemRepository repository)
     : ControllerBase
 {
     [HttpGet("{id}")]
@@ -34,7 +33,6 @@ public class TodoItemController(ITodoItemRepository repository, ITodoItemMetrics
     public async Task<CreatedAtActionResult> Add(AddInput input)
     {
         var item = await repository.AddAsync(input.Title, input.IsDone);
-        todoItemMetrics.ItemCreated(item);
 
         return CreatedAtAction(nameof(Get), new { id = item.Id }, item);
     }

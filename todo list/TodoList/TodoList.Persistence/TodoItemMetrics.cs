@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics.Metrics;
+using TodoList.App.Metrics;
 using TodoList.Domain;
 
-namespace TodoList.App.Metrics;
+namespace TodoList.Persistence;
 
 public class TodoItemMetrics : ITodoItemMetrics
 {

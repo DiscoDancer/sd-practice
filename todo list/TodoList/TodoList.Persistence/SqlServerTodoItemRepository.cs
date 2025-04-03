@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TodoList.App.Metrics;
 using TodoList.Domain;
 using TodoList.Persistence.Models;
 
 namespace TodoList.Persistence;
 
-public sealed class SqlServerTodoItemRepository(MasterContext dbContext) : ITodoItemRepository
+public sealed class SqlServerTodoItemRepository(MasterContext dbContext, ITodoItemMetrics todoItemMetrics) : ITodoItemRepository
 {
     public async Task<Domain.TodoItem?> GetAsync(long id)
     {
@@ -53,13 +54,16 @@ public sealed class SqlServerTodoItemRepository(MasterContext dbContext) : ITodo
             throw new Exception("Failed to save todo item");
         }
 
-        return new Domain.TodoItem
+        var domainObject = new Domain.TodoItem
         {
             CreatedAt = result.Entity.CreatedAt,
             Id = result.Entity.Id,
             IsDone = result.Entity.IsDone,
             Title = result.Entity.Title
         };
+        todoItemMetrics.ItemCreated(domainObject);
+
+        return domainObject;
     }
 
     public async Task<bool> UpdateAsync(long id, string? title, bool? isDone)

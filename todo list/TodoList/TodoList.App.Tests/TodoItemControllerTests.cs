@@ -2,7 +2,6 @@
 using Moq;
 using TodoList.App.Controllers;
 using TodoList.App.Dtos;
-using TodoList.App.Metrics;
 using TodoList.Domain;
 
 namespace TodoList.App.Tests;
@@ -10,14 +9,12 @@ namespace TodoList.App.Tests;
 public class TodoItemControllerTests
 {
     private readonly Mock<ITodoItemRepository> _mockService;
-    private readonly Mock<ITodoItemMetrics> _mockTodoItemMetrics;
     private readonly TodoItemController _controller;
 
     public TodoItemControllerTests()
     {
         _mockService = new Mock<ITodoItemRepository>();
-        _mockTodoItemMetrics = new Mock<ITodoItemMetrics>();
-        _controller = new TodoItemController(_mockService.Object, _mockTodoItemMetrics.Object);
+        _controller = new TodoItemController(_mockService.Object);
     }
 
     [Fact]
@@ -93,7 +90,6 @@ public class TodoItemControllerTests
         Assert.Equal(todoItem.Title, returnValue.Title);
         Assert.Equal(todoItem.CreatedAt, returnValue.CreatedAt);
         Assert.Equal(todoItem.IsDone, returnValue.IsDone);
-        _mockTodoItemMetrics.Verify(x => x.ItemCreated(todoItem), Times.Once);
     }
 
     [Fact]
