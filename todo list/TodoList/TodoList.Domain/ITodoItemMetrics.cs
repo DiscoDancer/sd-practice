@@ -1,6 +1,4 @@
-﻿using TodoList.Domain;
-
-namespace TodoList.App.Metrics;
+﻿namespace TodoList.Domain;
 
 public interface ITodoItemMetrics
 {

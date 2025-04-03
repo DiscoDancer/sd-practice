@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moq;
-using TodoList.App.Metrics;
+using TodoList.Domain;
 using TodoList.Persistence.Models;
+using TodoItem = TodoList.Persistence.Models.TodoItem;
 
 namespace TodoList.Persistence.Tests;
 

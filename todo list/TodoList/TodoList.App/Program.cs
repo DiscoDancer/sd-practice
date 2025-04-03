@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Metrics;
-using TodoList.App.Metrics;
 using TodoList.App.Middlewares;
 using TodoList.Domain;
 using TodoList.Persistence;
