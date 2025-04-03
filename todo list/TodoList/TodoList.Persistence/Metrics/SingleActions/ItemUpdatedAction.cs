@@ -1,20 +1,18 @@
 ﻿using System.Diagnostics.Metrics;
-using TodoList.Domain;
 using TodoList.Domain.Metrics.SingleActions;
 
 namespace TodoList.Persistence.Metrics.SingleActions;
 
 internal sealed class ItemUpdatedAction(Meter meter, string namePrefix) : BaseItemAction(meter, namePrefix, "updated"), IItemUpdatedAction
 {
-    public void ItemUpdated(TodoItem item)
+    public void ItemUpdated(long id, string? title, bool? isDone)
     {
         const int quantity = 1;
 
         Counter.Add(quantity,
-            CreateProperty("title", item.Title),
-            CreateProperty("isDone", item.IsDone),
-            CreateProperty("createdAt", item.CreatedAt),
-            CreateProperty("id", item.Id)
+            CreateProperty("id", id),
+            CreateProperty("title", title),
+            CreateProperty("isDone", isDone)
         );
     }
 }

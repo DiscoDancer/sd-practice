@@ -24,9 +24,9 @@ public class TodoItemMetrics : ITodoItemMetrics
         _itemCreatedAction.ItemCreated(item);
     }
 
-    public void ItemUpdated(TodoItem item)
+    public void ItemUpdated(long id, string? title, bool? isDone)
     {
-        _itemUpdatedAction.ItemUpdated(item);
+        _itemUpdatedAction.ItemUpdated(id, title, isDone);
     }
 
     public void ItemRetrieved(TodoItem item)

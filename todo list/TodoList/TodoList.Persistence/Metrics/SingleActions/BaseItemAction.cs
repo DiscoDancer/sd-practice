@@ -2,7 +2,7 @@
 
 namespace TodoList.Persistence.Metrics.SingleActions;
 
-internal abstract class BaseItemAction(Meter meter, string counterName, string namePrefix)
+internal abstract class BaseItemAction(Meter meter, string namePrefix, string counterName)
 {
     private protected readonly Counter<int> Counter = meter.CreateCounter<int>($"{namePrefix}.{counterName}");
 

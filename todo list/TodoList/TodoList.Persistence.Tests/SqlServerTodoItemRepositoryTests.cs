@@ -76,6 +76,7 @@ public class SqlServerTodoItemRepositoryTests
         Assert.Equal(updatedTodoItem.Title, retrievedTodoItem.Title);
         Assert.Equal(updatedTodoItem.IsDone, retrievedTodoItem.IsDone);
         Assert.Equal(updatedTodoItem.CreatedAt, retrievedTodoItem.CreatedAt);
+        _todoItemMetrics.Verify(x => x.ItemUpdated(todoItem.Entity.Id, updatedTodoItem.Title, updatedTodoItem.IsDone), Times.Once);
     }
 
     [Fact]

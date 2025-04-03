@@ -2,5 +2,5 @@
 
 public interface IItemUpdatedAction
 {
-    void ItemUpdated(TodoItem item);
+    void ItemUpdated(long id, string? title, bool? isDone);
 }

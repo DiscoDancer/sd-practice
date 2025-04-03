@@ -84,8 +84,13 @@ public sealed class SqlServerTodoItemRepository(MasterContext dbContext, ITodoIt
         }
 
         var changes = await dbContext.SaveChangesAsync();
+        if (changes > 0)
+        {
+            todoItemMetrics.ItemUpdated(id, title, isDone);
+            return true;
+        }
 
-        return changes > 0;
+        return false;
     }
 
     public async Task<bool> DeleteAsync(long id)
