@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TodoList.Domain;
+using TodoList.Domain.Metrics;
 using TodoList.Persistence.Models;
 
 namespace TodoList.Persistence;

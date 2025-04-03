@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moq;
-using TodoList.Domain;
+using TodoList.Domain.Metrics;
 using TodoList.Persistence.Models;
 using TodoItem = TodoList.Persistence.Models.TodoItem;
 

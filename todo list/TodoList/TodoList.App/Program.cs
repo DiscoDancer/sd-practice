@@ -2,7 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Metrics;
 using TodoList.App.Middlewares;
 using TodoList.Domain;
+using TodoList.Domain.Metrics;
 using TodoList.Persistence;
+using TodoList.Persistence.Metrics;
 using TodoList.Persistence.Models;
 
 var builder = WebApplication.CreateBuilder(args);
