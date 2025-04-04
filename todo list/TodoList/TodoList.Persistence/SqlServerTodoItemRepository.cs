@@ -109,7 +109,13 @@ public sealed class SqlServerTodoItemRepository(MasterContext dbContext, ITodoIt
         dbContext.TodoItems.Remove(todoItem);
         var changes = await dbContext.SaveChangesAsync();
 
-        return changes > 0;
+        var hasBeenDeleted = changes > 0;
+        if (hasBeenDeleted)
+        {
+            todoItemMetrics.ItemDeleted(id);
+        }
+
+        return hasBeenDeleted;
     }
 
     public async Task<bool> DeleteAllAsync()

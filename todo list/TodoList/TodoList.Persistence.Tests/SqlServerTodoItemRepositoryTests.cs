@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moq;
+using TodoList.Domain;
 using TodoList.Domain.Metrics;
 using TodoList.Persistence.Models;
 using TodoItem = TodoList.Persistence.Models.TodoItem;
@@ -91,6 +92,7 @@ public class SqlServerTodoItemRepositoryTests
         var result = await repository.UpdateAsync(999, "Updated Title", true);
         // Assert
         Assert.False(result);
+        _todoItemMetrics.Verify(x => x.ItemUpdated(999, "Updated Title", true), Times.Never);
         _todoItemMetrics.Verify(x => x.ItemSearchedById(999, false), Times.Once);
     }
 
@@ -120,8 +122,9 @@ public class SqlServerTodoItemRepositoryTests
         Assert.Equal(todoItem.Entity.CreatedAt, retrievedTodoItem.CreatedAt);
         _todoItemMetrics.Verify(x => x.ItemRetrieved(retrievedTodoItem));
     }
+
     [Fact]
-    public async Task DeleteAsync_ShouldRemoveTodoItem()
+    public async Task DeleteAsync_ShouldRemoveTodoItem_WhenItemWithIdExists()
     {
         // Arrange
         var options = GetInMemoryOptions();
@@ -137,11 +140,32 @@ public class SqlServerTodoItemRepositoryTests
         await dbContext.SaveChangesAsync();
 
         // Act
-        await repository.DeleteAsync(todoItem.Entity.Id);
+        var result = await repository.DeleteAsync(todoItem.Entity.Id);
 
         // Assert
+        Assert.True(result);
         var deletedTodoItem = await dbContext.TodoItems.FindAsync(todoItem.Entity.Id);
         Assert.Null(deletedTodoItem);
+        _todoItemMetrics.Verify(x => x.ItemDeleted(todoItem.Entity.Id), Times.Once);
+        _todoItemMetrics.Verify(x => x.ItemSearchedById(todoItem.Entity.Id, true), Times.Once);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_ShouldNotRemoveTodoItem_WhenItemWithIdDoesNotExist()
+    {
+        // Arrange
+        var options = GetInMemoryOptions();
+        await using var dbContext = new MasterContext(options);
+        var repository = new SqlServerTodoItemRepository(dbContext, _todoItemMetrics.Object);
+        const int id = 999; // Non-existing ID
+
+        // Act
+        var result = await repository.DeleteAsync(id);
+
+        // Assert
+        Assert.False(result);
+        _todoItemMetrics.Verify(x => x.ItemDeleted(id), Times.Never);
+        _todoItemMetrics.Verify(x => x.ItemSearchedById(id, false), Times.Once);
     }
 
     [Fact]
