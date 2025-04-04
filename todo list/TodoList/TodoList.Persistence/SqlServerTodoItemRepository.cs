@@ -32,13 +32,18 @@ public sealed class SqlServerTodoItemRepository(MasterContext dbContext, ITodoIt
     public async Task<IReadOnlyCollection<Domain.TodoItem>> GetAllAsync()
     {
         var todoItems = await dbContext.TodoItems.ToListAsync();
-        return todoItems.Select(todoItem => new Domain.TodoItem
+
+        var result = todoItems.Select(todoItem => new Domain.TodoItem
         {
             CreatedAt = todoItem.CreatedAt,
             Id = todoItem.Id,
             IsDone = todoItem.IsDone,
             Title = todoItem.Title
         }).ToList().AsReadOnly();
+
+        todoItemMetrics.ItemsRetrieved(todoItems.Count);
+
+        return result;
     }
 
     public async Task<Domain.TodoItem> AddAsync(string title, bool isDone)
@@ -127,9 +132,15 @@ public sealed class SqlServerTodoItemRepository(MasterContext dbContext, ITodoIt
         }
 
         dbContext.TodoItems.RemoveRange(todoItems);
-        var changes = await dbContext.SaveChangesAsync();
+        var changesCount = await dbContext.SaveChangesAsync();
 
-        return changes > 0;
+        if (changesCount > 0)
+        {
+            todoItemMetrics.ItemsDeleted(changesCount);
+            return true;
+        }
+
+        return false;
     }
 
     private async Task<Models.TodoItem?> FindByIdOrDefaultAsync(long id)

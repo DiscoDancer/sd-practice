@@ -192,6 +192,7 @@ public class SqlServerTodoItemRepositoryTests
         // Assert
         var count = await dbContext.TodoItems.CountAsync();
         Assert.Equal(0, count);
+        _todoItemMetrics.Verify(x => x.ItemsDeleted(todoItems.Count));
     }
 
     [Fact]
@@ -221,6 +222,7 @@ public class SqlServerTodoItemRepositoryTests
         Assert.Contains(retrievedTodoItems, item => item is { Title: "Test 1", IsDone: false });
         Assert.Contains(retrievedTodoItems, item => item is { Title: "Test 2", IsDone: true });
         Assert.Contains(retrievedTodoItems, item => item is { Title: "Test 3", IsDone: false });
+        _todoItemMetrics.Verify(x => x.ItemsRetrieved(todoItems.Count));
     }
 
 }

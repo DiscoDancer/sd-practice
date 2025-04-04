@@ -4,7 +4,7 @@ using TodoList.Domain.Metrics.SingleActions;
 
 namespace TodoList.Persistence.Metrics.SingleActions;
 
-internal sealed class ItemRetrievedAction(Meter meter, string namePrefix) : BaseItemAction(meter, namePrefix, "retrieved"), IItemRetrievedAction
+internal sealed class ItemRetrievedAction(Meter meter, string namePrefix) : BaseItemAction(meter, namePrefix, "retrieved"), IItemRetrievedAction, IItemsRetrievedAction
 {
     public void ItemRetrieved(TodoItem item)
     {
@@ -16,5 +16,10 @@ internal sealed class ItemRetrievedAction(Meter meter, string namePrefix) : Base
             CreateProperty("createdAt", item.CreatedAt),
             CreateProperty("id", item.Id)
         );
+    }
+
+    public void ItemsRetrieved(int count)
+    {
+        Counter.Add(count);
     }
 }

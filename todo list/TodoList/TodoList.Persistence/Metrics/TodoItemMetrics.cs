@@ -1,16 +1,17 @@
 ﻿using System.Diagnostics.Metrics;
 using TodoList.Domain;
 using TodoList.Domain.Metrics;
-using TodoList.Domain.Metrics.SingleActions;
 using TodoList.Persistence.Metrics.SingleActions;
 
 namespace TodoList.Persistence.Metrics;
 
 public class TodoItemMetrics : ITodoItemMetrics
 {
-    private readonly IItemCreatedAction _itemCreatedAction;
-    private readonly IItemUpdatedAction _itemUpdatedAction;
+    private readonly ItemCreatedAction _itemCreatedAction;
+    private readonly ItemUpdatedAction _itemUpdatedAction;
     private readonly ItemRetrievedAction _itemRetrievedAction;
+    private readonly ItemDeletedAction _itemDeletedAction;
+    private readonly ItemSearchedByIdAction _itemSearchedByIdAction;
     public const string NamePrefix = "todoList.item";
 
     public TodoItemMetrics(IMeterFactory meterFactory)
@@ -19,6 +20,8 @@ public class TodoItemMetrics : ITodoItemMetrics
         _itemCreatedAction = new ItemCreatedAction(meter, NamePrefix);
         _itemUpdatedAction = new ItemUpdatedAction(meter, NamePrefix);
         _itemRetrievedAction = new ItemRetrievedAction(meter, NamePrefix);
+        _itemDeletedAction = new ItemDeletedAction(meter, NamePrefix);
+        _itemSearchedByIdAction = new ItemSearchedByIdAction(meter, NamePrefix);
     }
 
     public void ItemCreated(TodoItem item)
@@ -38,21 +41,21 @@ public class TodoItemMetrics : ITodoItemMetrics
 
     public void ItemDeleted(long id)
     {
-        throw new NotImplementedException();
+        _itemDeletedAction.ItemDeleted(id);
     }
 
-    public void AllItemsRetrieved(int count)
+    public void ItemsRetrieved(int count)
     {
-        throw new NotImplementedException();
+        _itemRetrievedAction.ItemsRetrieved(count);
     }
 
-    public void AllItemsDeleted(int count)
+    public void ItemsDeleted(int count)
     {
-        throw new NotImplementedException();
+        _itemDeletedAction.ItemsDeleted(count);
     }
 
     public void ItemSearchedById(long id, bool result)
     {
-        throw new NotImplementedException();
+        _itemSearchedByIdAction.ItemSearchedById(id, result);
     }
 }
