@@ -76,7 +76,22 @@ public class SqlServerTodoItemRepositoryTests
         Assert.Equal(updatedTodoItem.Title, retrievedTodoItem.Title);
         Assert.Equal(updatedTodoItem.IsDone, retrievedTodoItem.IsDone);
         Assert.Equal(updatedTodoItem.CreatedAt, retrievedTodoItem.CreatedAt);
+        _todoItemMetrics.Verify(x => x.ItemSearchedById(todoItem.Entity.Id, true));
         _todoItemMetrics.Verify(x => x.ItemUpdated(todoItem.Entity.Id, updatedTodoItem.Title, updatedTodoItem.IsDone), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ShouldUpdateReturnFalse_WhenItemNotFoundById()
+    {
+        // Arrange
+        var options = GetInMemoryOptions();
+        await using var dbContext = new MasterContext(options);
+        var repository = new SqlServerTodoItemRepository(dbContext, _todoItemMetrics.Object);
+        // Act
+        var result = await repository.UpdateAsync(999, "Updated Title", true);
+        // Assert
+        Assert.False(result);
+        _todoItemMetrics.Verify(x => x.ItemSearchedById(999, false), Times.Once);
     }
 
     [Fact]
@@ -103,6 +118,7 @@ public class SqlServerTodoItemRepositoryTests
         Assert.Equal(todoItem.Entity.Title, retrievedTodoItem.Title);
         Assert.Equal(todoItem.Entity.IsDone, retrievedTodoItem.IsDone);
         Assert.Equal(todoItem.Entity.CreatedAt, retrievedTodoItem.CreatedAt);
+        _todoItemMetrics.Verify(x => x.ItemRetrieved(retrievedTodoItem));
     }
     [Fact]
     public async Task DeleteAsync_ShouldRemoveTodoItem()

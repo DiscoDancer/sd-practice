@@ -2,4 +2,4 @@
 
 namespace TodoList.Domain.Metrics;
 
-public interface ITodoItemMetrics : IItemCreatedAction, IItemUpdatedAction, IItemRetrievedAction, IItemDeletedAction, IAllItemsRetrievedAction, IAllItemsDeletedAction;
+public interface ITodoItemMetrics : IItemCreatedAction, IItemUpdatedAction, IItemRetrievedAction, IItemDeletedAction, IAllItemsRetrievedAction, IAllItemsDeletedAction, IItemSearchedByIdAction;

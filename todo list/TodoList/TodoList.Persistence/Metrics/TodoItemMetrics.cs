@@ -10,6 +10,7 @@ public class TodoItemMetrics : ITodoItemMetrics
 {
     private readonly IItemCreatedAction _itemCreatedAction;
     private readonly IItemUpdatedAction _itemUpdatedAction;
+    private readonly ItemRetrievedAction _itemRetrievedAction;
     public const string NamePrefix = "todoList.item";
 
     public TodoItemMetrics(IMeterFactory meterFactory)
@@ -17,6 +18,7 @@ public class TodoItemMetrics : ITodoItemMetrics
         var meter = meterFactory.Create("TodoList.App");
         _itemCreatedAction = new ItemCreatedAction(meter, NamePrefix);
         _itemUpdatedAction = new ItemUpdatedAction(meter, NamePrefix);
+        _itemRetrievedAction = new ItemRetrievedAction(meter, NamePrefix);
     }
 
     public void ItemCreated(TodoItem item)
@@ -31,7 +33,7 @@ public class TodoItemMetrics : ITodoItemMetrics
 
     public void ItemRetrieved(TodoItem item)
     {
-        throw new NotImplementedException();
+        _itemRetrievedAction.ItemRetrieved(item);
     }
 
     public void ItemDeleted(long id)
@@ -45,6 +47,11 @@ public class TodoItemMetrics : ITodoItemMetrics
     }
 
     public void AllItemsDeleted(int count)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void ItemSearchedById(long id, bool result)
     {
         throw new NotImplementedException();
     }

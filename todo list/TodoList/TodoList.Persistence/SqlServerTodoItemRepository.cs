@@ -9,19 +9,24 @@ public sealed class SqlServerTodoItemRepository(MasterContext dbContext, ITodoIt
 {
     public async Task<Domain.TodoItem?> GetAsync(long id)
     {
-        var todoItem = await dbContext.TodoItems.FindAsync(id);
+        var todoItem = await FindByIdOrDefaultAsync(id);
         if (todoItem is null)
         {
             return null;
         }
 
-        return new Domain.TodoItem
+
+        var result = new Domain.TodoItem
         {
             CreatedAt = todoItem.CreatedAt,
             Id = todoItem.Id,
             IsDone = todoItem.IsDone,
             Title = todoItem.Title
         };
+
+        todoItemMetrics.ItemRetrieved(result);
+
+        return result;
     }
 
     public async Task<IReadOnlyCollection<Domain.TodoItem>> GetAllAsync()
@@ -68,7 +73,7 @@ public sealed class SqlServerTodoItemRepository(MasterContext dbContext, ITodoIt
 
     public async Task<bool> UpdateAsync(long id, string? title, bool? isDone)
     {
-        var todoItem = await dbContext.TodoItems.FindAsync(id);
+        var todoItem = await FindByIdOrDefaultAsync(id);
         if (todoItem is null)
         {
             return false;
@@ -95,7 +100,7 @@ public sealed class SqlServerTodoItemRepository(MasterContext dbContext, ITodoIt
 
     public async Task<bool> DeleteAsync(long id)
     {
-        var todoItem = await dbContext.TodoItems.FindAsync(id);
+        var todoItem = await FindByIdOrDefaultAsync(id);
         if (todoItem is null)
         {
             return false;
@@ -119,5 +124,18 @@ public sealed class SqlServerTodoItemRepository(MasterContext dbContext, ITodoIt
         var changes = await dbContext.SaveChangesAsync();
 
         return changes > 0;
+    }
+
+    private async Task<Models.TodoItem?> FindByIdOrDefaultAsync(long id)
+    {
+        var result = await dbContext.TodoItems.FindAsync(id);
+        if (result is null)
+        {
+            todoItemMetrics.ItemSearchedById(id, false);
+            return null;
+        }
+
+        todoItemMetrics.ItemSearchedById(id, true);
+        return result;
     }
 }
