@@ -1,11 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Metrics;
 using TodoList.App.Middlewares;
-using TodoList.Domain;
-using TodoList.Domain.Metrics;
 using TodoList.Persistence;
-using TodoList.Persistence.Metrics;
-using TodoList.Persistence.Models;
+using TodoList.Persistence.Implementations.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,10 +19,8 @@ builder.Services.AddHealthChecks().AddDbContextCheck<MasterContext>();
 builder.Services.AddDbContext<MasterContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
 
+builder.Services.RegisterPersistence(builder.Configuration);
 
-builder.Services.AddScoped<ITodoItemRepository, SqlServerTodoItemRepository>();
-
-builder.Services.AddSingleton<ITodoItemMetrics, TodoItemMetrics>();
 
 builder.Services.AddOpenTelemetry()
     .WithMetrics(providerBuilder =>

@@ -2,8 +2,9 @@
 using Moq;
 using TodoList.Domain;
 using TodoList.Domain.Metrics;
-using TodoList.Persistence.Models;
-using TodoItem = TodoList.Persistence.Models.TodoItem;
+using TodoList.Persistence.Implementations;
+using TodoList.Persistence.Implementations.Models;
+using TodoItem = TodoList.Persistence.Implementations.Models.TodoItem;
 
 namespace TodoList.Persistence.Tests;
 

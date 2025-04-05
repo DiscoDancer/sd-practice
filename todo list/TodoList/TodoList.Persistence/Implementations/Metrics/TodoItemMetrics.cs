@@ -1,27 +1,27 @@
 ﻿using System.Diagnostics.Metrics;
 using TodoList.Domain;
 using TodoList.Domain.Metrics;
-using TodoList.Persistence.Metrics.SingleActions;
+using TodoList.Persistence.Implementations.Metrics.SingleActions;
 
-namespace TodoList.Persistence.Metrics;
+namespace TodoList.Persistence.Implementations.Metrics;
 
-public class TodoItemMetrics : ITodoItemMetrics
+internal class TodoItemMetrics : ITodoItemMetrics
 {
     private readonly ItemCreatedAction _itemCreatedAction;
     private readonly ItemUpdatedAction _itemUpdatedAction;
     private readonly ItemRetrievedAction _itemRetrievedAction;
     private readonly ItemDeletedAction _itemDeletedAction;
     private readonly ItemSearchedByIdAction _itemSearchedByIdAction;
-    public const string NamePrefix = "todoList.item";
 
     public TodoItemMetrics(IMeterFactory meterFactory)
     {
+        const string namePrefix = "todoList.item";
         var meter = meterFactory.Create("TodoList.App");
-        _itemCreatedAction = new ItemCreatedAction(meter, NamePrefix);
-        _itemUpdatedAction = new ItemUpdatedAction(meter, NamePrefix);
-        _itemRetrievedAction = new ItemRetrievedAction(meter, NamePrefix);
-        _itemDeletedAction = new ItemDeletedAction(meter, NamePrefix);
-        _itemSearchedByIdAction = new ItemSearchedByIdAction(meter, NamePrefix);
+        _itemCreatedAction = new ItemCreatedAction(meter, namePrefix);
+        _itemUpdatedAction = new ItemUpdatedAction(meter, namePrefix);
+        _itemRetrievedAction = new ItemRetrievedAction(meter, namePrefix);
+        _itemDeletedAction = new ItemDeletedAction(meter, namePrefix);
+        _itemSearchedByIdAction = new ItemSearchedByIdAction(meter, namePrefix);
     }
 
     public void ItemCreated(TodoItem item)

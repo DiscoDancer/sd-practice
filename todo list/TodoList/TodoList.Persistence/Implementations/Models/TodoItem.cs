@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace TodoList.Persistence.Models;
+﻿namespace TodoList.Persistence.Implementations.Models;
 
 public partial class TodoItem
 {

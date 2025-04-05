@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace TodoList.Persistence.Models;
+namespace TodoList.Persistence.Implementations.Models;
 
 public partial class MasterContext : DbContext
 {

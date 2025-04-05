@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.Metrics;
 using TodoList.Domain.Metrics.SingleActions;
 
-namespace TodoList.Persistence.Metrics.SingleActions;
+namespace TodoList.Persistence.Implementations.Metrics.SingleActions;
 
 internal sealed class ItemSearchedByIdAction(Meter meter, string namePrefix)
     : BaseItemAction(meter, namePrefix, "searchedById"), IItemSearchedByIdAction
@@ -11,8 +11,8 @@ internal sealed class ItemSearchedByIdAction(Meter meter, string namePrefix)
         const int quantity = 1;
 
         Counter.Add(quantity,
-            CreateProperty("id", id),
-            CreateProperty("result", result)
+            CreateProperty(Properties.Id, id),
+            CreateProperty(Properties.Result, result)
         );
     }
 }

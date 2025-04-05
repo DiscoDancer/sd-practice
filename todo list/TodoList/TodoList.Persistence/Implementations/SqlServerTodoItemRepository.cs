@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TodoList.Domain;
 using TodoList.Domain.Metrics;
-using TodoList.Persistence.Models;
+using TodoList.Persistence.Implementations.Models;
 
-namespace TodoList.Persistence;
+namespace TodoList.Persistence.Implementations;
 
-public sealed class SqlServerTodoItemRepository(MasterContext dbContext, ITodoItemMetrics todoItemMetrics) : ITodoItemRepository
+internal sealed class SqlServerTodoItemRepository(MasterContext dbContext, ITodoItemMetrics todoItemMetrics) : ITodoItemRepository
 {
     public async Task<Domain.TodoItem?> GetAsync(long id)
     {
