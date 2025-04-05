@@ -28,7 +28,7 @@ builder.Services.AddOpenTelemetry()
         providerBuilder.AddPrometheusExporter();
 
         providerBuilder.AddMeter("Microsoft.AspNetCore.Hosting",
-            "Microsoft.AspNetCore.Server.Kestrel");
+            "Microsoft.AspNetCore.Server.Kestrel", "TodoList.App");
         providerBuilder.AddView("http.server.request.duration",
             new ExplicitBucketHistogramConfiguration
             {
