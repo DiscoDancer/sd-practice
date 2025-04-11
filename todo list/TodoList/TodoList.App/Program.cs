@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Metrics;
+using Serilog;
+using Serilog.Sinks.Elasticsearch;
 using TodoList.App.Middlewares;
 using TodoList.Persistence;
 using TodoList.Persistence.Implementations.Models;
@@ -21,7 +23,6 @@ builder.Services.AddDbContext<MasterContext>(options =>
 
 builder.Services.RegisterPersistence(builder.Configuration);
 
-
 builder.Services.AddOpenTelemetry()
     .WithMetrics(providerBuilder =>
     {
@@ -39,6 +40,19 @@ builder.Services.AddOpenTelemetry()
                 ]
             });
     });
+
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration.ReadFrom.Configuration(context.Configuration)
+                 .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("https://localhost:9200"))
+                 {
+                     AutoRegisterTemplate = true,
+                     AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7,
+                     IndexFormat = "todoapp-logs-{0:yyyy.MM.dd}",
+                     ModifyConnectionSettings = conn =>
+                         conn.BasicAuthentication("elastic", "mOfkmnUdds3y-+rarQNc")
+                 });
+});
 
 var app = builder.Build();
 

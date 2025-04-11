@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using TodoList.App.Dtos;
 using TodoList.Domain;
 
@@ -8,7 +9,7 @@ namespace TodoList.App.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class TodoItemController(ITodoItemRepository repository)
+public class TodoItemController(ITodoItemRepository repository, ILogger<TodoItemController> logger)
     : ControllerBase
 {
     [HttpGet("{id}")]
@@ -33,6 +34,15 @@ public class TodoItemController(ITodoItemRepository repository)
     public async Task<CreatedAtActionResult> Add(AddInput input)
     {
         var item = await repository.AddAsync(input.Title, input.IsDone);
+
+        // Then log the event
+        logger.LogInformation("TodoItemCreated {@TodoItem}", new
+        {
+            item.Id,
+            item.IsDone,
+            item.Title,
+            item.CreatedAt
+        });
 
         return CreatedAtAction(nameof(Get), new { id = item.Id }, item);
     }
