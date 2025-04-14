@@ -43,7 +43,6 @@ builder.Services.AddOpenTelemetry()
             });
     });
 
-// Serilog Configuration in code
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)
@@ -66,20 +65,6 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
-
-
-//builder.Host.UseSerilog((context, services, configuration) =>
-//{
-//    configuration.ReadFrom.Configuration(context.Configuration)
-//                 .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("https://localhost:9200"))
-//                 {
-//                     AutoRegisterTemplate = true,
-//                     AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7,
-//                     IndexFormat = "todoapp-logs-{0:yyyy.MM.dd}",
-//                     ModifyConnectionSettings = conn =>
-//                         conn.BasicAuthentication("elastic", "mOfkmnUdds3y-+rarQNc")
-//                 });
-//});
 
 var app = builder.Build();
 
