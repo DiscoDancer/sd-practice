@@ -43,28 +43,18 @@ builder.Services.AddOpenTelemetry()
             });
     });
 
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Debug()
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)
-    .MinimumLevel.Override("System", LogEventLevel.Debug)
-    .Enrich.FromLogContext()
-    .WriteTo.Console()
-    .WriteTo.File(
-        path: "Logs/log-.txt",
-        rollingInterval: RollingInterval.Day,
-        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}"
-    )
-    .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("https://localhost:9200"))
-    {
-        AutoRegisterTemplate = true,
-        IndexFormat = "aspnet-logs-{0:yyyy.MM.dd}",
-        ModifyConnectionSettings = x => x
-            .BasicAuthentication("elastic", "mOfkmnUdds3y-+rarQNc")
-            .ServerCertificateValidationCallback((o, certificate, chain, errors) => true)
-    })
-    .CreateLogger();
 
-builder.Host.UseSerilog();
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("https://localhost:9200"))
+        {
+            ModifyConnectionSettings = x => x
+                .BasicAuthentication("elastic", "mOfkmnUdds3y-+rarQNc")
+                .ServerCertificateValidationCallback((o, certificate, chain, errors) => true)
+        });
+});
 
 var app = builder.Build();
 
