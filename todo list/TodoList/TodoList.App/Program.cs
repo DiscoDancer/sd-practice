@@ -1,6 +1,8 @@
+using System.Runtime.ConstrainedExecution;
 using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Metrics;
 using Serilog;
+using Serilog.Events;
 using Serilog.Sinks.Elasticsearch;
 using TodoList.App.Middlewares;
 using TodoList.Persistence;
@@ -41,18 +43,43 @@ builder.Services.AddOpenTelemetry()
             });
     });
 
-builder.Host.UseSerilog((context, services, configuration) =>
-{
-    configuration.ReadFrom.Configuration(context.Configuration)
-                 .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("https://localhost:9200"))
-                 {
-                     AutoRegisterTemplate = true,
-                     AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7,
-                     IndexFormat = "todoapp-logs-{0:yyyy.MM.dd}",
-                     ModifyConnectionSettings = conn =>
-                         conn.BasicAuthentication("elastic", "mOfkmnUdds3y-+rarQNc")
-                 });
-});
+// Serilog Configuration in code
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)
+    .MinimumLevel.Override("System", LogEventLevel.Debug)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File(
+        path: "Logs/log-.txt",
+        rollingInterval: RollingInterval.Day,
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}"
+    )
+    .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("https://localhost:9200"))
+    {
+        AutoRegisterTemplate = true,
+        IndexFormat = "aspnet-logs-{0:yyyy.MM.dd}",
+        ModifyConnectionSettings = x => x
+            .BasicAuthentication("elastic", "mOfkmnUdds3y-+rarQNc")
+            .ServerCertificateValidationCallback((o, certificate, chain, errors) => true)
+    })
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
+
+//builder.Host.UseSerilog((context, services, configuration) =>
+//{
+//    configuration.ReadFrom.Configuration(context.Configuration)
+//                 .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("https://localhost:9200"))
+//                 {
+//                     AutoRegisterTemplate = true,
+//                     AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7,
+//                     IndexFormat = "todoapp-logs-{0:yyyy.MM.dd}",
+//                     ModifyConnectionSettings = conn =>
+//                         conn.BasicAuthentication("elastic", "mOfkmnUdds3y-+rarQNc")
+//                 });
+//});
 
 var app = builder.Build();
 
