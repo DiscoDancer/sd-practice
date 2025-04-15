@@ -1,31 +1,32 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
 using Moq;
 using TodoList.App.Controllers;
 using TodoList.App.Dtos;
 using TodoList.Domain;
+using TodoList.Domain.Events;
+using TodoList.Domain.Services;
 
 namespace TodoList.App.Tests;
 
 public class TodoItemControllerTests
 {
-    private readonly Mock<ITodoItemRepository> _mockService;
-    private readonly TodoItemController _controller;
+    private readonly Mock<ITodoItemRepository> _mockRepository = new();
+    private readonly Mock<ITodoItemService> _mockService = new();
+    private readonly ILogger<TodoItemController> _logger = new FakeLogger<TodoItemController>();
 
-    public TodoItemControllerTests()
-    {
-        _mockService = new Mock<ITodoItemRepository>();
-        _controller = new TodoItemController(_mockService.Object);
-    }
+    private TodoItemController Controller => new(_mockRepository.Object, _logger, _mockService.Object);
 
     [Fact]
     public async Task GetTodoItems_ReturnsOkResult_WithListOfTodoItems()
     {
         // Arrange
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
-        _mockService.Setup(service => service.GetAllAsync()).ReturnsAsync(new List<TodoItem> { todoItem });
+        _mockRepository.Setup(service => service.GetAllAsync()).ReturnsAsync(new List<TodoItem> { todoItem });
 
         // Act
-        var result = await _controller.GetAll();
+        var result = await Controller.GetAll();
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result.Result);
@@ -42,10 +43,10 @@ public class TodoItemControllerTests
     {
         // Arrange
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
-        _mockService.Setup(service => service.GetAsync(1)).ReturnsAsync(todoItem);
+        _mockRepository.Setup(service => service.GetAsync(1)).ReturnsAsync(todoItem);
 
         // Act
-        var result = await _controller.Get(1);
+        var result = await Controller.Get(1);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result.Result);
@@ -60,10 +61,10 @@ public class TodoItemControllerTests
     public async Task GetTodoItem_ReturnsNotFoundResult_WhenTodoItemNotFound()
     {
         // Arrange
-        _mockService.Setup(service => service.GetAsync(1)).ReturnsAsync((TodoItem?)null);
+        _mockRepository.Setup(service => service.GetAsync(1)).ReturnsAsync((TodoItem?)null);
 
         // Act
-        var result = await _controller.Get(1);
+        var result = await Controller.Get(1);
 
         // Assert
         Assert.IsType<NotFoundResult>(result.Result);
@@ -74,10 +75,10 @@ public class TodoItemControllerTests
     {
         // Arrange
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
-        _mockService.Setup(service => service.AddAsync(todoItem.Title, todoItem.IsDone)).ReturnsAsync(todoItem);
+        _mockService.Setup(service => service.AddAsync(todoItem.Title, todoItem.IsDone)).ReturnsAsync(Result<TodoCreatedEvent>.Success(new TodoCreatedEvent(todoItem)));
 
         // Act
-        var result = await _controller.Add(new AddInput
+        var result = await Controller.Add(new AddInput
         {
             IsDone = todoItem.IsDone,
             Title = todoItem.Title
@@ -97,10 +98,10 @@ public class TodoItemControllerTests
     {
         // Arrange
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
-        _mockService.Setup(service => service.UpdateAsync(todoItem.Id, todoItem.Title, todoItem.IsDone)).ReturnsAsync(true);
+        _mockRepository.Setup(service => service.UpdateAsync(todoItem.Id, todoItem.Title, todoItem.IsDone)).ReturnsAsync(true);
 
         // Act
-        var result = await _controller.Update(todoItem.Id, new UpdateInput
+        var result = await Controller.Update(todoItem.Id, new UpdateInput
         {
             IsDone = todoItem.IsDone,
             Title = todoItem.Title,
@@ -115,10 +116,10 @@ public class TodoItemControllerTests
     {
         // Arrange
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
-        _mockService.Setup(service => service.UpdateAsync(todoItem.Id, todoItem.Title, todoItem.IsDone)).ReturnsAsync(false);
+        _mockRepository.Setup(service => service.UpdateAsync(todoItem.Id, todoItem.Title, todoItem.IsDone)).ReturnsAsync(false);
 
         // Act
-        var result = await _controller.Update(todoItem.Id, new UpdateInput
+        var result = await Controller.Update(todoItem.Id, new UpdateInput
         {
             IsDone = todoItem.IsDone,
             Title = todoItem.Title,
@@ -132,10 +133,10 @@ public class TodoItemControllerTests
     public async Task DeleteTodoItem_ReturnsNoContentResult()
     {
         // Arrange
-        _mockService.Setup(service => service.DeleteAsync(1)).ReturnsAsync(true);
+        _mockRepository.Setup(service => service.DeleteAsync(1)).ReturnsAsync(true);
 
         // Act
-        var result = await _controller.Delete(1);
+        var result = await Controller.Delete(1);
 
         // Assert
         Assert.IsType<NoContentResult>(result);
@@ -145,10 +146,10 @@ public class TodoItemControllerTests
     public async Task DeleteTodoItem_ReturnsBadRequest_WhenTodoItemNotExist()
     {
         // Arrange
-        _mockService.Setup(service => service.DeleteAsync(1)).ReturnsAsync(false);
+        _mockRepository.Setup(service => service.DeleteAsync(1)).ReturnsAsync(false);
 
         // Act
-        var result = await _controller.Delete(1);
+        var result = await Controller.Delete(1);
 
         // Assert
         Assert.IsType<BadRequestResult>(result);
@@ -158,9 +159,9 @@ public class TodoItemControllerTests
     public async Task DeleteAllTodoItems_ReturnsNoContentResult()
     {
         // Arrange
-        _mockService.Setup(service => service.DeleteAllAsync()).ReturnsAsync(true);
+        _mockRepository.Setup(service => service.DeleteAllAsync()).ReturnsAsync(true);
         // Act
-        var result = await _controller.DeleteAll();
+        var result = await Controller.DeleteAll();
         // Assert
         Assert.IsType<NoContentResult>(result);
     }
@@ -169,9 +170,9 @@ public class TodoItemControllerTests
     public async Task DeleteAllTodoItems_ReturnsBadRequest_WhenNoTodoItems()
     {
         // Arrange
-        _mockService.Setup(service => service.DeleteAllAsync()).ReturnsAsync(false);
+        _mockRepository.Setup(service => service.DeleteAllAsync()).ReturnsAsync(false);
         // Act
-        var result = await _controller.DeleteAll();
+        var result = await Controller.DeleteAll();
         // Assert
         Assert.IsType<BadRequestResult>(result);
     }

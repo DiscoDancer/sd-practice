@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Serilog;
 using TodoList.App.Dtos;
 using TodoList.Domain;
 using TodoList.Domain.Events;
