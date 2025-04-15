@@ -58,6 +58,7 @@ builder.Host.UseSerilog((context, services, configuration) =>
         .ReadFrom.Configuration(context.Configuration)
         .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(elasticUri))
         {
+            // disable cert check, not possible to do in appsettings.json
             ModifyConnectionSettings = x => x
                 .BasicAuthentication(elasticUsername, elasticPassword)
                 .ServerCertificateValidationCallback((o, certificate, chain, errors) => true),
