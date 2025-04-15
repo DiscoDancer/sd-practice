@@ -46,14 +46,30 @@ builder.Services.AddOpenTelemetry()
 
 builder.Host.UseSerilog((context, services, configuration) =>
 {
+    var elasticUri = context.Configuration["Elastic:Uri"];
+    var elasticUsername = context.Configuration["Elastic:Username"];
+    var elasticPassword = context.Configuration["Elastic:Password"];
+
+    ArgumentException.ThrowIfNullOrWhiteSpace(elasticUri);
+    ArgumentException.ThrowIfNullOrWhiteSpace(elasticUsername);
+    ArgumentException.ThrowIfNullOrWhiteSpace(elasticPassword);
+
     configuration
         .ReadFrom.Configuration(context.Configuration)
-        .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("https://localhost:9200"))
+        .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(elasticUri))
         {
             ModifyConnectionSettings = x => x
-                .BasicAuthentication("elastic", "mOfkmnUdds3y-+rarQNc")
-                .ServerCertificateValidationCallback((o, certificate, chain, errors) => true)
-        });
+                .BasicAuthentication(elasticUsername, elasticPassword)
+                .ServerCertificateValidationCallback((o, certificate, chain, errors) => true),
+            AutoRegisterTemplate = true,
+            IndexFormat = "aspnet-logs-{0:yyyy.MM.dd}"
+        })
+        .WriteTo.Console()
+        .WriteTo.File(
+            path: "Logs/log-.txt",
+            rollingInterval: RollingInterval.Day,
+            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}"
+        );
 });
 
 var app = builder.Build();
