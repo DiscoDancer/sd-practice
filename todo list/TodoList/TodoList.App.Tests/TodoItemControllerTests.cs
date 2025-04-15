@@ -14,7 +14,7 @@ public class TodoItemControllerTests
 {
     private readonly Mock<ITodoItemRepository> _mockRepository = new();
     private readonly Mock<ITodoItemService> _mockService = new();
-    private readonly ILogger<TodoItemController> _logger = new FakeLogger<TodoItemController>();
+    private readonly FakeLogger<TodoItemController> _logger = new();
 
     private TodoItemController Controller => new(_mockRepository.Object, _logger, _mockService.Object);
 
@@ -71,7 +71,7 @@ public class TodoItemControllerTests
     }
 
     [Fact]
-    public async Task AddTodoItem_ReturnsCreatedAtActionResult()
+    public async Task AddTodoItem_WhenHappyPath_ReturnsCreatedAtActionResult()
     {
         // Arrange
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
@@ -91,6 +91,34 @@ public class TodoItemControllerTests
         Assert.Equal(todoItem.Title, returnValue.Title);
         Assert.Equal(todoItem.CreatedAt, returnValue.CreatedAt);
         Assert.Equal(todoItem.IsDone, returnValue.IsDone);
+        _mockService.Verify(
+            service => service.AddAsync(
+                It.Is<string>(title => title == todoItem.Title),
+                It.Is<bool>(isDone => isDone == todoItem.IsDone)),
+            Times.Once);
+
+        Assert.Equal(1, _logger.Collector.Count);
+        Assert.Equal(LogLevel.Information, _logger.LatestRecord.Level);
+    }
+
+    [Fact]
+    public async Task AddTodoItem_WhenServiceReturnsError_ReturnsBadRequest()
+    {
+        // Arrange
+        const string errorMessage = "Failure";
+        var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
+        _mockService.Setup(service => service.AddAsync(todoItem.Title, todoItem.IsDone)).ReturnsAsync(Result<TodoCreatedEvent>.Failure(errorMessage));
+
+        // Act
+        var result = await Controller.Add(new AddInput
+        {
+            IsDone = todoItem.IsDone,
+            Title = todoItem.Title
+        });
+
+        // Assert
+        var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+        Assert.Equal(errorMessage, badRequestResult.Value);
     }
 
     [Fact]
