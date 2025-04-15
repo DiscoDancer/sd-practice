@@ -2,6 +2,7 @@
 using Serilog;
 using TodoList.App.Dtos;
 using TodoList.Domain;
+using TodoList.Domain.Events;
 
 namespace TodoList.App.Controllers;
 
@@ -35,14 +36,18 @@ public class TodoItemController(ITodoItemRepository repository, ILogger<TodoItem
     {
         var item = await repository.AddAsync(input.Title, input.IsDone);
 
+        var ev = new TodoCreatedEvent(item);
+
         // Then log the event
-        logger.LogInformation("TodoItemCreated {@TodoItem}", new
-        {
-            item.Id,
-            item.IsDone,
-            item.Title,
-            item.CreatedAt
-        });
+        logger.LogInformation("{EventType} {@Event}",
+            nameof(TodoCreatedEvent),
+            new
+            {
+                ev.TodoItem.Id,
+                ev.TodoItem.IsDone,
+                ev.TodoItem.Title,
+                ev.TodoItem.CreatedAt,
+            });
 
         return CreatedAtAction(nameof(Get), new { id = item.Id }, item);
     }
