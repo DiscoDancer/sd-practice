@@ -5,6 +5,8 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.Elasticsearch;
 using TodoList.App.Middlewares;
+using TodoList.Domain;
+using TodoList.Domain.Services;
 using TodoList.Persistence;
 using TodoList.Persistence.Implementations.Models;
 
@@ -24,6 +26,8 @@ builder.Services.AddDbContext<MasterContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
 
 builder.Services.RegisterPersistence(builder.Configuration);
+
+builder.Services.AddScoped<ITodoItemService, TodoItemService>();
 
 builder.Services.AddOpenTelemetry()
     .WithMetrics(providerBuilder =>

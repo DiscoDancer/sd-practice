@@ -3,6 +3,7 @@ using Serilog;
 using TodoList.App.Dtos;
 using TodoList.Domain;
 using TodoList.Domain.Events;
+using TodoList.Domain.Services;
 
 namespace TodoList.App.Controllers;
 
@@ -10,7 +11,7 @@ namespace TodoList.App.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class TodoItemController(ITodoItemRepository repository, ILogger<TodoItemController> logger)
+public class TodoItemController(ITodoItemRepository repository, ILogger<TodoItemController> logger, ITodoItemService service)
     : ControllerBase
 {
     [HttpGet("{id}")]
@@ -32,24 +33,28 @@ public class TodoItemController(ITodoItemRepository repository, ILogger<TodoItem
     }
 
     [HttpPost]
-    public async Task<CreatedAtActionResult> Add(AddInput input)
+    public async Task<IActionResult> Add(AddInput input)
     {
-        var item = await repository.AddAsync(input.Title, input.IsDone);
+        var result = await service.AddAsync(input.Title, input.IsDone);
+        if (result.IsFailure || result.Value == null)
+        {
+            return BadRequest(result.Error);
+        }
 
-        var ev = new TodoCreatedEvent(item);
+        var resultEvent = result.Value;
+        var todoItem = resultEvent.TodoItem;
 
-        // Then log the event
         logger.LogInformation("{EventType} {@Event}",
             nameof(TodoCreatedEvent),
             new
             {
-                ev.TodoItem.Id,
-                ev.TodoItem.IsDone,
-                ev.TodoItem.Title,
-                ev.TodoItem.CreatedAt,
+                todoItem.Id,
+                todoItem.IsDone,
+                todoItem.Title,
+                todoItem.CreatedAt,
             });
 
-        return CreatedAtAction(nameof(Get), new { id = item.Id }, item);
+        return CreatedAtAction(nameof(Get), new { id = todoItem.Id }, todoItem);
     }
 
     [HttpPut("{id}")]

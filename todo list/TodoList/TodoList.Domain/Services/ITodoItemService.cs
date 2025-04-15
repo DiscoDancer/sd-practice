@@ -1,0 +1,8 @@
+﻿using TodoList.Domain.Events;
+
+namespace TodoList.Domain.Services;
+
+public interface ITodoItemService
+{
+    public Task<Result<TodoCreatedEvent>> AddAsync(string title, bool isDone);
+}
