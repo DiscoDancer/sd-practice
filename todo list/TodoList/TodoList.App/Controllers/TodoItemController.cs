@@ -59,11 +59,27 @@ public class TodoItemController(ITodoItemRepository repository, ILogger<TodoItem
     [HttpPut("{id}")]
     public async Task<ActionResult> Update(long id, [FromBody] UpdateInput input)
     {
-        var isUpdated = await repository.UpdateAsync(id, input.Title, input.IsDone);
-        if (!isUpdated)
+        var result = await service.UpdateAsync(id, input.Title, input.IsDone);
+        if (result.IsFailure || result.Value == null)
+        {
+            return BadRequest(result.Error);
+        }
+
+        logger.LogInformation("{EventType} {@Event}",
+            nameof(TodoUpdatedEvent),
+            new
+            {
+                result.Value.UpdateStatus,
+                result.Value.Id,
+                result.Value.IsDone,
+                result.Value.Title,
+            });
+        
+        if (result.Value.UpdateStatus == UpdateStatus.NotUpdated)
         {
             return BadRequest();
         }
+
         return NoContent();
     }
 

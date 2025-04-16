@@ -122,11 +122,12 @@ public class TodoItemControllerTests
     }
 
     [Fact]
-    public async Task UpdateTodoItem_ReturnsNoContentResult()
+    public async Task UpdateTodoItemFully_ReturnsNoContentResult()
     {
         // Arrange
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
-        _mockRepository.Setup(service => service.UpdateAsync(todoItem.Id, todoItem.Title, todoItem.IsDone)).ReturnsAsync(true);
+        _mockService.Setup(x => x.UpdateAsync(todoItem.Id, todoItem.Title, todoItem.IsDone))
+            .ReturnsAsync(Result<TodoUpdatedEvent>.Success(new TodoUpdatedEvent(UpdateStatus.Updated, todoItem.Id, todoItem.Title, todoItem.IsDone)));
 
         // Act
         var result = await Controller.Update(todoItem.Id, new UpdateInput
@@ -140,11 +141,30 @@ public class TodoItemControllerTests
     }
 
     [Fact]
+    public async Task UpdateTodoItemPartially_ReturnsNoContentResult()
+    {
+        // Arrange
+        var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
+        _mockService.Setup(x => x.UpdateAsync(todoItem.Id, todoItem.Title, null))
+            .ReturnsAsync(Result<TodoUpdatedEvent>.Success(new TodoUpdatedEvent(UpdateStatus.Updated, todoItem.Id, todoItem.Title, null)));
+
+        // Act
+        var result = await Controller.Update(todoItem.Id, new UpdateInput
+        {
+            Title = todoItem.Title,
+        });
+
+        // Assert
+        Assert.IsType<NoContentResult>(result);
+    }
+
+    [Fact]
     public async Task UpdateTodoItem_ReturnsBadRequest_WhenTodoItemNotUpdated()
     {
         // Arrange
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
-        _mockRepository.Setup(service => service.UpdateAsync(todoItem.Id, todoItem.Title, todoItem.IsDone)).ReturnsAsync(false);
+        _mockService.Setup(x => x.UpdateAsync(todoItem.Id, todoItem.Title, todoItem.IsDone))
+            .ReturnsAsync(Result<TodoUpdatedEvent>.Success(new TodoUpdatedEvent(UpdateStatus.NotUpdated, todoItem.Id, todoItem.Title, todoItem.IsDone)));
 
         // Act
         var result = await Controller.Update(todoItem.Id, new UpdateInput
@@ -155,6 +175,25 @@ public class TodoItemControllerTests
 
         // Assert
         Assert.IsType<BadRequestResult>(result);
+    }
+
+    [Fact]
+    public async Task UpdateTodoItem_ReturnsBadRequest_WhenFailure()
+    {
+        // Arrange
+        var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
+        _mockService.Setup(x => x.UpdateAsync(todoItem.Id, todoItem.Title, todoItem.IsDone))
+            .ReturnsAsync(Result<TodoUpdatedEvent>.Failure("Failure!"));
+
+        // Act
+        var result = await Controller.Update(todoItem.Id, new UpdateInput
+        {
+            IsDone = todoItem.IsDone,
+            Title = todoItem.Title,
+        });
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(result);
     }
 
     [Fact]
