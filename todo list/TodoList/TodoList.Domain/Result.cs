@@ -17,6 +17,13 @@ public sealed class Result<T>
         return new Result<T>(false, error, default);
     }
 
+    public void Deconstruct(out bool isSuccess, out T? value, out string? error)
+    {
+        isSuccess = IsSuccess;
+        value = Value;
+        error = Error;
+    }
+
     private Result(bool isSuccess, string? error, T? value)
     {
         IsSuccess = isSuccess;
