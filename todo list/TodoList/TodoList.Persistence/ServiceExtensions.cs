@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TodoList.Domain;
+using TodoList.Domain.Interfaces;
 using TodoList.Persistence.Implementations;
 
 namespace TodoList.Persistence;

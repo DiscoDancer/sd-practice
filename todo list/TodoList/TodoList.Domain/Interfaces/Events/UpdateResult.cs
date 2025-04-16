@@ -1,4 +1,4 @@
-﻿namespace TodoList.Domain.Events;
+﻿namespace TodoList.Domain.Interfaces.Events;
 
 public enum UpdateResult
 {

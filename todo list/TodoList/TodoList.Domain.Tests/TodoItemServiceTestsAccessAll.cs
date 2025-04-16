@@ -1,5 +1,6 @@
 ﻿using Moq;
-using TodoList.Domain.Services;
+using TodoList.Domain.Implementations;
+using TodoList.Domain.Interfaces;
 
 namespace TodoList.Domain.Tests;
 

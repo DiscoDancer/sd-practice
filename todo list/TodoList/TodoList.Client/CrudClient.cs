@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
 using TodoList.App.Dtos;
-using TodoList.Domain;
+using TodoList.Domain.Interfaces;
 
 namespace TodoList.Client;
 

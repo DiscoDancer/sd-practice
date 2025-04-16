@@ -1,6 +1,6 @@
-﻿using TodoList.Domain.Events;
+﻿using TodoList.Domain.Interfaces.Events;
 
-namespace TodoList.Domain.Services;
+namespace TodoList.Domain.Interfaces;
 
 public interface ITodoItemService
 {

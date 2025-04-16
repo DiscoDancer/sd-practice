@@ -1,12 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TodoList.Domain;
+using TodoList.Domain.Interfaces;
 using TodoList.Persistence.Implementations.Models;
+using TodoItem = TodoList.Domain.Interfaces.TodoItem;
 
 namespace TodoList.Persistence.Implementations;
 
 internal sealed class SqlServerTodoItemRepository(MasterContext dbContext) : ITodoItemRepository
 {
-    public async Task<Domain.TodoItem?> GetAsync(long id)
+    public async Task<Domain.Interfaces.TodoItem?> GetAsync(long id)
     {
         var todoItem = await FindByIdOrDefaultAsync(id);
         if (todoItem is null)
@@ -14,7 +15,7 @@ internal sealed class SqlServerTodoItemRepository(MasterContext dbContext) : ITo
             return null;
         }
 
-        var result = new Domain.TodoItem
+        var result = new TodoItem
         {
             CreatedAt = todoItem.CreatedAt,
             Id = todoItem.Id,
@@ -25,11 +26,11 @@ internal sealed class SqlServerTodoItemRepository(MasterContext dbContext) : ITo
         return result;
     }
 
-    public async Task<IReadOnlyCollection<Domain.TodoItem>> GetAllAsync()
+    public async Task<IReadOnlyCollection<Domain.Interfaces.TodoItem>> GetAllAsync()
     {
         var todoItems = await dbContext.TodoItems.ToListAsync();
 
-        var result = todoItems.Select(todoItem => new Domain.TodoItem
+        var result = todoItems.Select(todoItem => new TodoItem
         {
             CreatedAt = todoItem.CreatedAt,
             Id = todoItem.Id,
@@ -40,7 +41,7 @@ internal sealed class SqlServerTodoItemRepository(MasterContext dbContext) : ITo
         return result;
     }
 
-    public async Task<Domain.TodoItem> AddAsync(string title, bool isDone)
+    public async Task<Domain.Interfaces.TodoItem> AddAsync(string title, bool isDone)
     {
         var todoItem = new Models.TodoItem
         {
@@ -58,7 +59,7 @@ internal sealed class SqlServerTodoItemRepository(MasterContext dbContext) : ITo
             throw new Exception("Failed to save todo item");
         }
 
-        var domainObject = new Domain.TodoItem
+        var domainObject = new TodoItem
         {
             CreatedAt = result.Entity.CreatedAt,
             Id = result.Entity.Id,

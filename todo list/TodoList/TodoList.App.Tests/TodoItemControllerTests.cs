@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging.Testing;
 using Moq;
 using TodoList.App.Controllers;
-using TodoList.Domain.Services;
+using TodoList.Domain.Interfaces;
 
 namespace TodoList.App.Tests;
 

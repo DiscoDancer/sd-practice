@@ -1,8 +1,9 @@
-﻿using TodoList.Domain.Events;
+﻿using TodoList.Domain.Interfaces;
+using TodoList.Domain.Interfaces.Events;
 
-namespace TodoList.Domain.Services;
+namespace TodoList.Domain.Implementations;
 
-public sealed class TodoItemService(ITodoItemRepository repository) : ITodoItemService
+internal sealed class TodoItemService(ITodoItemRepository repository) : ITodoItemService
 {
     public async Task<Result<TodoCreatedEvent>> AddAsync(string title, bool isDone)
     {

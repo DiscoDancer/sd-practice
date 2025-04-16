@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TodoList.App.Dtos;
-using TodoList.Domain;
-using TodoList.Domain.Events;
-using TodoList.Domain.Services;
+using TodoList.Domain.Interfaces;
+using TodoList.Domain.Interfaces.Events;
 
 namespace TodoList.App.Controllers;
 

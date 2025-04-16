@@ -1,4 +1,4 @@
-﻿namespace TodoList.Domain;
+﻿namespace TodoList.Domain.Interfaces;
 
 public sealed class Result<T>
 {

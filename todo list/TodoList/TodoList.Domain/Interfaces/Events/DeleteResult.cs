@@ -1,4 +1,4 @@
-﻿namespace TodoList.Domain;
+﻿namespace TodoList.Domain.Interfaces.Events;
 
 public enum DeleteResult
 {

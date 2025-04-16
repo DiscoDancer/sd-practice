@@ -2,8 +2,8 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using TodoList.App.Dtos;
-using TodoList.Domain.Events;
-using TodoList.Domain;
+using TodoList.Domain.Interfaces;
+using TodoList.Domain.Interfaces.Events;
 
 namespace TodoList.App.Tests;
 

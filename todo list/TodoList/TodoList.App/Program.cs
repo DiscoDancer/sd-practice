@@ -1,12 +1,9 @@
-using System.Runtime.ConstrainedExecution;
 using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Metrics;
 using Serilog;
-using Serilog.Events;
 using Serilog.Sinks.Elasticsearch;
 using TodoList.App.Middlewares;
-using TodoList.Domain;
-using TodoList.Domain.Services;
+using TodoList.Domain.Interfaces;
 using TodoList.Persistence;
 using TodoList.Persistence.Implementations.Models;
 
@@ -26,8 +23,8 @@ builder.Services.AddDbContext<MasterContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
 
 builder.Services.RegisterPersistence(builder.Configuration);
+builder.Services.RegisterDomainServices(builder.Configuration);
 
-builder.Services.AddScoped<ITodoItemService, TodoItemService>();
 
 builder.Services.AddOpenTelemetry()
     .WithMetrics(providerBuilder =>
@@ -71,9 +68,10 @@ builder.Host.UseSerilog((context, services, configuration) =>
         })
         .WriteTo.Console()
         .WriteTo.File(
-            path: "Logs/log-.txt",
+            "Logs/log-.txt",
             rollingInterval: RollingInterval.Day,
-            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}"
+            outputTemplate:
+            "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}"
         );
 });
 
@@ -83,10 +81,7 @@ app.MapOpenApi();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-if (app.Environment.EnvironmentName.Equals("Docker"))
-{
-    app.UseMiddleware<ContainerIdHeaderMiddleware>();
-}
+if (app.Environment.EnvironmentName.Equals("Docker")) app.UseMiddleware<ContainerIdHeaderMiddleware>();
 
 app.MapControllers();
 
