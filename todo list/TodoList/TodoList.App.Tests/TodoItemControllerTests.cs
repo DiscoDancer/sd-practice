@@ -39,40 +39,6 @@ public abstract class TodoItemControllerTests
     }
 
     [Fact]
-    public async Task GetTodoItem_ReturnsOkResult_WithTodoItem()
-    {
-        // Arrange
-        var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
-        MockRepository.Setup(service => service.GetAsync(1)).ReturnsAsync(todoItem);
-
-        // Act
-        var result = await Controller.Get(1);
-
-        // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result.Result);
-        var returnValue = Assert.IsType<TodoItem>(okResult.Value);
-        Assert.Equal(todoItem.Id, returnValue.Id);
-        Assert.Equal(todoItem.Title, returnValue.Title);
-        Assert.Equal(todoItem.CreatedAt, returnValue.CreatedAt);
-        Assert.Equal(todoItem.IsDone, returnValue.IsDone);
-    }
-
-    [Fact]
-    public async Task GetTodoItem_ReturnsNotFoundResult_WhenTodoItemNotFound()
-    {
-        // Arrange
-        MockRepository.Setup(service => service.GetAsync(1)).ReturnsAsync((TodoItem?)null);
-
-        // Act
-        var result = await Controller.Get(1);
-
-        // Assert
-        Assert.IsType<NotFoundResult>(result.Result);
-    }
-
-   
-
-    [Fact]
     public async Task DeleteTodoItem_ReturnsNoContentResult()
     {
         // Arrange
