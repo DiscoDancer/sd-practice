@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Moq;
-using TodoList.Domain.Metrics;
 using TodoList.Persistence.Implementations;
 using TodoList.Persistence.Implementations.Models;
 using TodoItem = TodoList.Persistence.Implementations.Models.TodoItem;
@@ -9,7 +7,6 @@ namespace TodoList.Persistence.Tests;
 
 public class SqlServerTodoItemRepositoryTests
 {
-    private readonly Mock<ITodoItemMetrics> _todoItemMetrics = new();
 
     private static DbContextOptions<MasterContext> GetInMemoryOptions()
     {
@@ -24,7 +21,7 @@ public class SqlServerTodoItemRepositoryTests
         // Arrange
         var options = GetInMemoryOptions();
         await using var dbContext = new MasterContext(options);
-        var repository = new SqlServerTodoItemRepository(dbContext, _todoItemMetrics.Object);
+        var repository = new SqlServerTodoItemRepository(dbContext);
 
         // Act
         var todoItem = await repository.AddAsync("Test", false);
@@ -49,7 +46,7 @@ public class SqlServerTodoItemRepositoryTests
         // Arrange
         var options = GetInMemoryOptions();
         await using var dbContext = new MasterContext(options);
-        var repository = new SqlServerTodoItemRepository(dbContext, _todoItemMetrics.Object);
+        var repository = new SqlServerTodoItemRepository(dbContext);
 
         var todoItem = dbContext.TodoItems.Add(new TodoItem
         {
@@ -84,7 +81,7 @@ public class SqlServerTodoItemRepositoryTests
         // Arrange
         var options = GetInMemoryOptions();
         await using var dbContext = new MasterContext(options);
-        var repository = new SqlServerTodoItemRepository(dbContext, _todoItemMetrics.Object);
+        var repository = new SqlServerTodoItemRepository(dbContext);
         // Act
         var result = await repository.UpdateAsync(999, "Updated Title", true);
         // Assert
@@ -97,7 +94,7 @@ public class SqlServerTodoItemRepositoryTests
         // Arrange
         var options = GetInMemoryOptions();
         await using var dbContext = new MasterContext(options);
-        var repository = new SqlServerTodoItemRepository(dbContext, _todoItemMetrics.Object);
+        var repository = new SqlServerTodoItemRepository(dbContext);
 
         var todoItem = dbContext.TodoItems.Add(new TodoItem
         {
@@ -123,7 +120,7 @@ public class SqlServerTodoItemRepositoryTests
         // Arrange
         var options = GetInMemoryOptions();
         await using var dbContext = new MasterContext(options);
-        var repository = new SqlServerTodoItemRepository(dbContext, _todoItemMetrics.Object);
+        var repository = new SqlServerTodoItemRepository(dbContext);
 
         var todoItem = dbContext.TodoItems.Add(new TodoItem
         {
@@ -146,7 +143,7 @@ public class SqlServerTodoItemRepositoryTests
         // Arrange
         var options = GetInMemoryOptions();
         await using var dbContext = new MasterContext(options);
-        var repository = new SqlServerTodoItemRepository(dbContext, _todoItemMetrics.Object);
+        var repository = new SqlServerTodoItemRepository(dbContext);
 
         var todoItem = dbContext.TodoItems.Add(new TodoItem
         {
@@ -163,7 +160,6 @@ public class SqlServerTodoItemRepositoryTests
         Assert.True(result);
         var deletedTodoItem = await dbContext.TodoItems.FindAsync(todoItem.Entity.Id);
         Assert.Null(deletedTodoItem);
-        _todoItemMetrics.Verify(x => x.ItemDeleted(todoItem.Entity.Id), Times.Once);
     }
 
     [Fact]
@@ -172,7 +168,7 @@ public class SqlServerTodoItemRepositoryTests
         // Arrange
         var options = GetInMemoryOptions();
         await using var dbContext = new MasterContext(options);
-        var repository = new SqlServerTodoItemRepository(dbContext, _todoItemMetrics.Object);
+        var repository = new SqlServerTodoItemRepository(dbContext);
         const int id = 999; // Non-existing ID
 
         // Act
@@ -180,7 +176,6 @@ public class SqlServerTodoItemRepositoryTests
 
         // Assert
         Assert.False(result);
-        _todoItemMetrics.Verify(x => x.ItemDeleted(id), Times.Never);
     }
 
     [Fact]
@@ -189,7 +184,7 @@ public class SqlServerTodoItemRepositoryTests
         // Arrange
         var options = GetInMemoryOptions();
         await using var dbContext = new MasterContext(options);
-        var repository = new SqlServerTodoItemRepository(dbContext, _todoItemMetrics.Object);
+        var repository = new SqlServerTodoItemRepository(dbContext);
 
         var todoItems = new List<TodoItem>
         {
@@ -202,12 +197,12 @@ public class SqlServerTodoItemRepositoryTests
         await dbContext.SaveChangesAsync();
 
         // Act
-        await repository.DeleteAllAsync();
+        var countRemoved = await repository.DeleteAllAsync();
 
         // Assert
         var count = await dbContext.TodoItems.CountAsync();
+        Assert.Equal(todoItems.Count, countRemoved);
         Assert.Equal(0, count);
-        _todoItemMetrics.Verify(x => x.ItemsDeleted(todoItems.Count));
     }
 
     [Fact]
@@ -216,7 +211,7 @@ public class SqlServerTodoItemRepositoryTests
         // Arrange
         var options = GetInMemoryOptions();
         await using var dbContext = new MasterContext(options);
-        var repository = new SqlServerTodoItemRepository(dbContext, _todoItemMetrics.Object);
+        var repository = new SqlServerTodoItemRepository(dbContext);
 
         var todoItems = new List<TodoItem>
         {
