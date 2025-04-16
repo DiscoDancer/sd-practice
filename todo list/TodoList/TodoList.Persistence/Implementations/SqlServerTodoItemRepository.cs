@@ -24,8 +24,6 @@ internal sealed class SqlServerTodoItemRepository(MasterContext dbContext, ITodo
             Title = todoItem.Title
         };
 
-        todoItemMetrics.ItemRetrieved(result);
-
         return result;
     }
 
@@ -40,8 +38,6 @@ internal sealed class SqlServerTodoItemRepository(MasterContext dbContext, ITodo
             IsDone = todoItem.IsDone,
             Title = todoItem.Title
         }).ToList().AsReadOnly();
-
-        todoItemMetrics.ItemsRetrieved(todoItems.Count);
 
         return result;
     }

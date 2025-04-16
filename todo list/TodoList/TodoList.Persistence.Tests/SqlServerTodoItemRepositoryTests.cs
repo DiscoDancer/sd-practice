@@ -117,7 +117,6 @@ public class SqlServerTodoItemRepositoryTests
         Assert.Equal(todoItem.Entity.Title, retrievedTodoItem.Title);
         Assert.Equal(todoItem.Entity.IsDone, retrievedTodoItem.IsDone);
         Assert.Equal(todoItem.Entity.CreatedAt, retrievedTodoItem.CreatedAt);
-        _todoItemMetrics.Verify(x => x.ItemRetrieved(retrievedTodoItem));
     }
 
     [Fact]
@@ -219,7 +218,6 @@ public class SqlServerTodoItemRepositoryTests
         Assert.Contains(retrievedTodoItems, item => item is { Title: "Test 1", IsDone: false });
         Assert.Contains(retrievedTodoItems, item => item is { Title: "Test 2", IsDone: true });
         Assert.Contains(retrievedTodoItems, item => item is { Title: "Test 3", IsDone: false });
-        _todoItemMetrics.Verify(x => x.ItemsRetrieved(todoItems.Count));
     }
 
 }
