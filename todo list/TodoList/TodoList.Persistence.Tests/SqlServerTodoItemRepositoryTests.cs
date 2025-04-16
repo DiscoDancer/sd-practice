@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moq;
-using TodoList.Domain;
 using TodoList.Domain.Metrics;
 using TodoList.Persistence.Implementations;
 using TodoList.Persistence.Implementations.Models;
@@ -78,7 +77,6 @@ public class SqlServerTodoItemRepositoryTests
         Assert.Equal(updatedTodoItem.IsDone, retrievedTodoItem.IsDone);
         Assert.Equal(updatedTodoItem.CreatedAt, retrievedTodoItem.CreatedAt);
         _todoItemMetrics.Verify(x => x.ItemSearchedById(todoItem.Entity.Id, true));
-        _todoItemMetrics.Verify(x => x.ItemUpdated(todoItem.Entity.Id, updatedTodoItem.Title, updatedTodoItem.IsDone), Times.Once);
     }
 
     [Fact]
@@ -92,7 +90,6 @@ public class SqlServerTodoItemRepositoryTests
         var result = await repository.UpdateAsync(999, "Updated Title", true);
         // Assert
         Assert.False(result);
-        _todoItemMetrics.Verify(x => x.ItemUpdated(999, "Updated Title", true), Times.Never);
         _todoItemMetrics.Verify(x => x.ItemSearchedById(999, false), Times.Once);
     }
 
