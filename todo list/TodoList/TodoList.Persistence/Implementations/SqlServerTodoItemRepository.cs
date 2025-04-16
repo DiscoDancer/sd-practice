@@ -15,7 +15,6 @@ internal sealed class SqlServerTodoItemRepository(MasterContext dbContext, ITodo
             return null;
         }
 
-
         var result = new Domain.TodoItem
         {
             CreatedAt = todoItem.CreatedAt,
@@ -135,13 +134,6 @@ internal sealed class SqlServerTodoItemRepository(MasterContext dbContext, ITodo
     private async Task<Models.TodoItem?> FindByIdOrDefaultAsync(long id)
     {
         var result = await dbContext.TodoItems.FindAsync(id);
-        if (result is null)
-        {
-            todoItemMetrics.ItemSearchedById(id, false);
-            return null;
-        }
-
-        todoItemMetrics.ItemSearchedById(id, true);
-        return result;
+        return result ?? null;
     }
 }

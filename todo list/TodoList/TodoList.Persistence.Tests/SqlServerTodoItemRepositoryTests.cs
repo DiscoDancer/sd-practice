@@ -76,7 +76,6 @@ public class SqlServerTodoItemRepositoryTests
         Assert.Equal(updatedTodoItem.Title, retrievedTodoItem.Title);
         Assert.Equal(updatedTodoItem.IsDone, retrievedTodoItem.IsDone);
         Assert.Equal(updatedTodoItem.CreatedAt, retrievedTodoItem.CreatedAt);
-        _todoItemMetrics.Verify(x => x.ItemSearchedById(todoItem.Entity.Id, true));
     }
 
     [Fact]
@@ -90,7 +89,6 @@ public class SqlServerTodoItemRepositoryTests
         var result = await repository.UpdateAsync(999, "Updated Title", true);
         // Assert
         Assert.False(result);
-        _todoItemMetrics.Verify(x => x.ItemSearchedById(999, false), Times.Once);
     }
 
     [Fact]
@@ -120,6 +118,29 @@ public class SqlServerTodoItemRepositoryTests
     }
 
     [Fact]
+    public async Task GetByIdAsync_ShouldReturnNull_WhenNotFound()
+    {
+        // Arrange
+        var options = GetInMemoryOptions();
+        await using var dbContext = new MasterContext(options);
+        var repository = new SqlServerTodoItemRepository(dbContext, _todoItemMetrics.Object);
+
+        var todoItem = dbContext.TodoItems.Add(new TodoItem
+        {
+            Title = "Test",
+            IsDone = false,
+            CreatedAt = DateTime.UtcNow,
+        });
+
+        // Act
+        var retrievedTodoItem = await repository.GetAsync(todoItem.Entity.Id+1);
+
+        // Assert
+        Assert.Null(retrievedTodoItem);
+    }
+
+
+    [Fact]
     public async Task DeleteAsync_ShouldRemoveTodoItem_WhenItemWithIdExists()
     {
         // Arrange
@@ -143,7 +164,6 @@ public class SqlServerTodoItemRepositoryTests
         var deletedTodoItem = await dbContext.TodoItems.FindAsync(todoItem.Entity.Id);
         Assert.Null(deletedTodoItem);
         _todoItemMetrics.Verify(x => x.ItemDeleted(todoItem.Entity.Id), Times.Once);
-        _todoItemMetrics.Verify(x => x.ItemSearchedById(todoItem.Entity.Id, true), Times.Once);
     }
 
     [Fact]
@@ -161,7 +181,6 @@ public class SqlServerTodoItemRepositoryTests
         // Assert
         Assert.False(result);
         _todoItemMetrics.Verify(x => x.ItemDeleted(id), Times.Never);
-        _todoItemMetrics.Verify(x => x.ItemSearchedById(id, false), Times.Once);
     }
 
     [Fact]
