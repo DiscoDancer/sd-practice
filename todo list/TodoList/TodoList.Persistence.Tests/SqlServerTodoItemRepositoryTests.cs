@@ -32,7 +32,7 @@ public class SqlServerTodoItemRepositoryTests
         Assert.Equal("Test", todoItem.Title);
         Assert.False(todoItem.IsDone);
 
-        var savedTodoItem = await dbContext.TodoItems.FindAsync(todoItem.Id);
+        var savedTodoItem = await dbContext.TodoItems.FindAsync([todoItem.Id], TestContext.Current.CancellationToken);
         Assert.NotNull(savedTodoItem);
         Assert.Equal(todoItem.Id, savedTodoItem.Id);
         Assert.Equal(todoItem.Title, savedTodoItem.Title);
@@ -54,7 +54,7 @@ public class SqlServerTodoItemRepositoryTests
             IsDone = false,
             CreatedAt = DateTime.UtcNow,
         });
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var updatedTodoItem = new TodoItem
@@ -67,7 +67,7 @@ public class SqlServerTodoItemRepositoryTests
         await repository.UpdateAsync(todoItem.Entity.Id, updatedTodoItem.Title, updatedTodoItem.IsDone);
 
         // Assert
-        var retrievedTodoItem = await dbContext.TodoItems.FindAsync(todoItem.Entity.Id);
+        var retrievedTodoItem = await dbContext.TodoItems.FindAsync([todoItem.Entity.Id], TestContext.Current.CancellationToken);
         Assert.NotNull(retrievedTodoItem);
         Assert.Equal(updatedTodoItem.Id, retrievedTodoItem.Id);
         Assert.Equal(updatedTodoItem.Title, retrievedTodoItem.Title);
@@ -151,14 +151,14 @@ public class SqlServerTodoItemRepositoryTests
             IsDone = false,
             CreatedAt = DateTime.UtcNow,
         });
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = await repository.DeleteAsync(todoItem.Entity.Id);
 
         // Assert
         Assert.True(result);
-        var deletedTodoItem = await dbContext.TodoItems.FindAsync(todoItem.Entity.Id);
+        var deletedTodoItem = await dbContext.TodoItems.FindAsync([todoItem.Entity.Id], TestContext.Current.CancellationToken);
         Assert.Null(deletedTodoItem);
     }
 
@@ -194,13 +194,13 @@ public class SqlServerTodoItemRepositoryTests
         };
 
         dbContext.TodoItems.AddRange(todoItems);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var countRemoved = await repository.DeleteAllAsync();
 
         // Assert
-        var count = await dbContext.TodoItems.CountAsync();
+        var count = await dbContext.TodoItems.CountAsync(TestContext.Current.CancellationToken);
         Assert.Equal(todoItems.Count, countRemoved);
         Assert.Equal(0, count);
     }
@@ -221,7 +221,7 @@ public class SqlServerTodoItemRepositoryTests
         };
 
         dbContext.TodoItems.AddRange(todoItems);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var retrievedTodoItems = await repository.GetAllAsync();
