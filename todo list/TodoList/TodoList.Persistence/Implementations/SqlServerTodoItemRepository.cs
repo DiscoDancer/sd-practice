@@ -1,11 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TodoList.Domain;
-using TodoList.Domain.Metrics;
 using TodoList.Persistence.Implementations.Models;
 
 namespace TodoList.Persistence.Implementations;
 
-internal sealed class SqlServerTodoItemRepository(MasterContext dbContext, ITodoItemMetrics todoItemMetrics) : ITodoItemRepository
+internal sealed class SqlServerTodoItemRepository(MasterContext dbContext) : ITodoItemRepository
 {
     public async Task<Domain.TodoItem?> GetAsync(long id)
     {
@@ -103,32 +102,22 @@ internal sealed class SqlServerTodoItemRepository(MasterContext dbContext, ITodo
         var changes = await dbContext.SaveChangesAsync();
 
         var hasBeenDeleted = changes > 0;
-        if (hasBeenDeleted)
-        {
-            todoItemMetrics.ItemDeleted(id);
-        }
 
         return hasBeenDeleted;
     }
 
-    public async Task<bool> DeleteAllAsync()
+    public async Task<int> DeleteAllAsync()
     {
         var todoItems = await dbContext.TodoItems.ToListAsync();
         if (!todoItems.Any())
         {
-            return false;
+            return 0;
         }
 
         dbContext.TodoItems.RemoveRange(todoItems);
         var changesCount = await dbContext.SaveChangesAsync();
 
-        if (changesCount > 0)
-        {
-            todoItemMetrics.ItemsDeleted(changesCount);
-            return true;
-        }
-
-        return false;
+        return changesCount;
     }
 
     private async Task<Models.TodoItem?> FindByIdOrDefaultAsync(long id)
