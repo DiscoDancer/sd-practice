@@ -32,6 +32,18 @@ public sealed class TodoItemService(ITodoItemRepository repository) : ITodoItemS
         return Result<TodoUpdatedEvent>.Success(eventResult);
     }
 
+    public async Task<Result<TodoAccessedEvent>> AccessAsync(long id)
+    {
+        if (id <= 0)
+        {
+            return Result<TodoAccessedEvent>.Failure("Id must be greater than 0");
+        }
+
+        var result = await repository.GetAsync(id);
+
+        return Result<TodoAccessedEvent>.Success(result == null ? new TodoAccessedEvent(AccessResult.NotFound, id, null) : new TodoAccessedEvent(AccessResult.Found, id, result));
+    }
+
 
     /// <returns>error message or null</returns>
     private static string? CheckTitleIsNullOrWhiteSpace(string title)
