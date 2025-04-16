@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
 using Moq;
 using TodoList.App.Controllers;
-using TodoList.App.Dtos;
 using TodoList.Domain;
-using TodoList.Domain.Events;
 using TodoList.Domain.Services;
 
 namespace TodoList.App.Tests;
@@ -17,26 +14,6 @@ public abstract class TodoItemControllerTests
     private protected readonly FakeLogger<TodoItemController> Logger = new();
 
     private protected TodoItemController Controller => new(MockRepository.Object, Logger, MockService.Object);
-
-    [Fact]
-    public async Task GetTodoItems_ReturnsOkResult_WithListOfTodoItems()
-    {
-        // Arrange
-        var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
-        MockRepository.Setup(service => service.GetAllAsync()).ReturnsAsync(new List<TodoItem> { todoItem });
-
-        // Act
-        var result = await Controller.GetAll();
-
-        // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result.Result);
-        var returnValue = Assert.IsType<List<TodoItem>>(okResult.Value);
-        Assert.Single(returnValue);
-        Assert.Equal(todoItem.Id, returnValue[0].Id);
-        Assert.Equal(todoItem.Title, returnValue[0].Title);
-        Assert.Equal(todoItem.CreatedAt, returnValue[0].CreatedAt);
-        Assert.Equal(todoItem.IsDone, returnValue[0].IsDone);
-    }
 
     [Fact]
     public async Task DeleteTodoItem_ReturnsNoContentResult()

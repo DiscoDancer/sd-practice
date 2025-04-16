@@ -52,8 +52,27 @@ public class TodoItemController(ITodoItemRepository repository, ILogger<TodoItem
     [HttpGet]
     public async Task<ActionResult<IReadOnlyCollection<TodoItem>>> GetAll()
     {
-        var items = await repository.GetAllAsync();
-        return Ok(items);
+        var result = await service.AccessAllAsync();
+        if (result.IsFailure || result.Value == null)
+        {
+            return BadRequest(result.Error);
+        }
+
+        var resultEvent = result.Value;
+
+        logger.LogInformation("{EventType} {@Event}",
+            nameof(TodoAccessedAllEvent),
+            new
+            {
+                resultEvent.Items.Count,
+            });
+
+        if (resultEvent.Items.Count == 0)
+        {
+            return NotFound();
+        }
+
+        return Ok(resultEvent.Items);
     }
 
     [HttpPost]
