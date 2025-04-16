@@ -10,7 +10,7 @@ namespace TodoList.App.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class TodoItemController(ITodoItemRepository repository, ILogger<TodoItemController> logger, ITodoItemService service)
+public class TodoItemController(ILogger<TodoItemController> logger, ITodoItemService service)
     : ControllerBase
 {
     [HttpGet("{id}")]
@@ -150,7 +150,21 @@ public class TodoItemController(ITodoItemRepository repository, ILogger<TodoItem
     [HttpDelete]
     public async Task<ActionResult> DeleteAll()
     {
-        var deletedCount = await repository.DeleteAllAsync();
+        var result = await service.DeleteAllAsync();
+        if (result.IsFailure || result.Value == null)
+        {
+            return BadRequest(result.Error);
+        }
+
+        logger.LogInformation("{EventType} {@Event}",
+            nameof(TodoDeletedAllEvent),
+            new
+            {
+                result.Value.Count,
+            });
+
+        var deletedCount = result.Value.Count;
+
         if (deletedCount == 0)
         {
             return BadRequest();
