@@ -6,9 +6,9 @@ namespace TodoList.Domain.Tests;
 public sealed class TodoItemServiceTestsUpdate : TodoItemServiceTests
 {
     [Theory]
-    [InlineData(true, UpdateStatus.Updated)]
-    [InlineData(false, UpdateStatus.NotUpdated)]
-    public async Task UpdateAsync_ShouldReturnSuccess_WhenUpdateIsValid(bool repositoryResult, UpdateStatus expectedStatus)
+    [InlineData(true, UpdateResult.Updated)]
+    [InlineData(false, UpdateResult.NotUpdated)]
+    public async Task UpdateAsync_ShouldReturnSuccess_WhenUpdateIsValid(bool repositoryResult, UpdateResult expectedStatus)
     {
         // Arrange
         const long id = 1;

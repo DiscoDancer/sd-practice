@@ -1,6 +1,6 @@
 ﻿namespace TodoList.Domain.Events;
 
-public enum UpdateStatus
+public enum UpdateResult
 {
     Updated,
     NotUpdated

@@ -26,7 +26,7 @@ public sealed class TodoItemService(ITodoItemRepository repository) : ITodoItemS
 
         var result = await repository.UpdateAsync(id, title, isDone);
 
-        var status = result ? UpdateStatus.Updated : UpdateStatus.NotUpdated;
+        var status = result ? UpdateResult.Updated : UpdateResult.NotUpdated;
         var eventResult = new TodoUpdatedEvent(status, id, title, isDone);
 
         return Result<TodoUpdatedEvent>.Success(eventResult);

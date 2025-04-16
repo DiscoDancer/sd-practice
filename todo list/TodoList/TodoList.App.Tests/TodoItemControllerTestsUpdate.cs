@@ -15,7 +15,7 @@ public sealed class TodoItemControllerTestsUpdate: TodoItemControllerTests
         // Arrange
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
         MockService.Setup(x => x.UpdateAsync(todoItem.Id, todoItem.Title, todoItem.IsDone))
-            .ReturnsAsync(Result<TodoUpdatedEvent>.Success(new TodoUpdatedEvent(UpdateStatus.Updated, todoItem.Id, todoItem.Title, todoItem.IsDone)));
+            .ReturnsAsync(Result<TodoUpdatedEvent>.Success(new TodoUpdatedEvent(UpdateResult.Updated, todoItem.Id, todoItem.Title, todoItem.IsDone)));
 
         // Act
         var result = await Controller.Update(todoItem.Id, new UpdateInput
@@ -36,7 +36,7 @@ public sealed class TodoItemControllerTestsUpdate: TodoItemControllerTests
         // Arrange
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
         MockService.Setup(x => x.UpdateAsync(todoItem.Id, todoItem.Title, null))
-            .ReturnsAsync(Result<TodoUpdatedEvent>.Success(new TodoUpdatedEvent(UpdateStatus.Updated, todoItem.Id, todoItem.Title, null)));
+            .ReturnsAsync(Result<TodoUpdatedEvent>.Success(new TodoUpdatedEvent(UpdateResult.Updated, todoItem.Id, todoItem.Title, null)));
 
         // Act
         var result = await Controller.Update(todoItem.Id, new UpdateInput
@@ -56,7 +56,7 @@ public sealed class TodoItemControllerTestsUpdate: TodoItemControllerTests
         // Arrange
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
         MockService.Setup(x => x.UpdateAsync(todoItem.Id, todoItem.Title, todoItem.IsDone))
-            .ReturnsAsync(Result<TodoUpdatedEvent>.Success(new TodoUpdatedEvent(UpdateStatus.NotUpdated, todoItem.Id, todoItem.Title, todoItem.IsDone)));
+            .ReturnsAsync(Result<TodoUpdatedEvent>.Success(new TodoUpdatedEvent(UpdateResult.NotUpdated, todoItem.Id, todoItem.Title, todoItem.IsDone)));
 
         // Act
         var result = await Controller.Update(todoItem.Id, new UpdateInput

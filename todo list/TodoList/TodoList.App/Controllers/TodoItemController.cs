@@ -75,7 +75,7 @@ public class TodoItemController(ITodoItemRepository repository, ILogger<TodoItem
                 result.Value.Title,
             });
         
-        if (result.Value.UpdateStatus == UpdateStatus.NotUpdated)
+        if (result.Value.UpdateStatus == UpdateResult.NotUpdated)
         {
             return BadRequest();
         }
