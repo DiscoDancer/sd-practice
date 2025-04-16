@@ -16,12 +16,37 @@ public class TodoItemController(ITodoItemRepository repository, ILogger<TodoItem
     [HttpGet("{id}")]
     public async Task<ActionResult<TodoItem>> Get(long id)
     {
-        var item = await repository.GetAsync(id);
-        if (item is null)
+        var result = await service.AccessAsync(id);
+        if (result.IsFailure || result.Value == null)
         {
+            return BadRequest(result.Error);
+        }
+
+        var resultEvent = result.Value;
+        if (resultEvent.Result == AccessResult.NotFound || resultEvent.Item == null)
+        {
+            logger.LogInformation("{EventType} {@Event}",
+                nameof(TodoAccessedEvent),
+                new
+                {
+                    resultEvent.Id,
+                    resultEvent.Result
+                });
             return NotFound();
         }
-        return Ok(item);
+
+        logger.LogInformation("{EventType} {@Event}",
+            nameof(TodoAccessedEvent),
+            new
+            {
+                resultEvent.Id,
+                resultEvent.Item.CreatedAt,
+                resultEvent.Item.IsDone,
+                resultEvent.Item.Title,
+                resultEvent.Result
+            });
+
+        return Ok(resultEvent.Item);
     }
 
     [HttpGet]
