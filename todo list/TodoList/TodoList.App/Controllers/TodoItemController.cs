@@ -130,19 +130,28 @@ public class TodoItemController(ITodoItemRepository repository, ILogger<TodoItem
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(long id)
     {
-        var isDeleted = await repository.DeleteAsync(id);
-        if (!isDeleted)
+        var result = await service.DeleteAsync(id);
+        if (result.IsFailure || result.Value == null)
         {
-            return BadRequest();
+            return BadRequest(result.Error);
         }
+
+        logger.LogInformation("{EventType} {@Event}",
+            nameof(TodoDeletedEvent),
+            new
+            {
+                result.Value.DeleteResult,
+                result.Value.Id,
+            });
+
         return NoContent();
     }
 
     [HttpDelete]
     public async Task<ActionResult> DeleteAll()
     {
-        var isDeleted = await repository.DeleteAllAsync();
-        if (!isDeleted)
+        var deletedCount = await repository.DeleteAllAsync();
+        if (deletedCount == 0)
         {
             return BadRequest();
         }

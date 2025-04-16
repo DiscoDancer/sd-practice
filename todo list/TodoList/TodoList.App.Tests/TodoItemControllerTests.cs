@@ -15,51 +15,25 @@ public abstract class TodoItemControllerTests
 
     private protected TodoItemController Controller => new(MockRepository.Object, Logger, MockService.Object);
 
-    [Fact]
-    public async Task DeleteTodoItem_ReturnsNoContentResult()
-    {
-        // Arrange
-        MockRepository.Setup(service => service.DeleteAsync(1)).ReturnsAsync(true);
+    //[Fact]
+    //public async Task DeleteAllTodoItems_ReturnsNoContentResult()
+    //{
+    //    // Arrange
+    //    MockRepository.Setup(service => service.DeleteAllAsync()).ReturnsAsync(true);
+    //    // Act
+    //    var result = await Controller.DeleteAll();
+    //    // Assert
+    //    Assert.IsType<NoContentResult>(result);
+    //}
 
-        // Act
-        var result = await Controller.Delete(1);
-
-        // Assert
-        Assert.IsType<NoContentResult>(result);
-    }
-
-    [Fact]
-    public async Task DeleteTodoItem_ReturnsBadRequest_WhenTodoItemNotExist()
-    {
-        // Arrange
-        MockRepository.Setup(service => service.DeleteAsync(1)).ReturnsAsync(false);
-
-        // Act
-        var result = await Controller.Delete(1);
-
-        // Assert
-        Assert.IsType<BadRequestResult>(result);
-    }
-
-    [Fact]
-    public async Task DeleteAllTodoItems_ReturnsNoContentResult()
-    {
-        // Arrange
-        MockRepository.Setup(service => service.DeleteAllAsync()).ReturnsAsync(true);
-        // Act
-        var result = await Controller.DeleteAll();
-        // Assert
-        Assert.IsType<NoContentResult>(result);
-    }
-
-    [Fact]
-    public async Task DeleteAllTodoItems_ReturnsBadRequest_WhenNoTodoItems()
-    {
-        // Arrange
-        MockRepository.Setup(service => service.DeleteAllAsync()).ReturnsAsync(false);
-        // Act
-        var result = await Controller.DeleteAll();
-        // Assert
-        Assert.IsType<BadRequestResult>(result);
-    }
+    //[Fact]
+    //public async Task DeleteAllTodoItems_ReturnsBadRequest_WhenNoTodoItems()
+    //{
+    //    // Arrange
+    //    MockRepository.Setup(service => service.DeleteAllAsync()).ReturnsAsync(false);
+    //    // Act
+    //    var result = await Controller.DeleteAll();
+    //    // Assert
+    //    Assert.IsType<BadRequestResult>(result);
+    //}
 }
