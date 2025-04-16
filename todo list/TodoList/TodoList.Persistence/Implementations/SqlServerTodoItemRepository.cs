@@ -71,7 +71,6 @@ internal sealed class SqlServerTodoItemRepository(MasterContext dbContext, ITodo
             IsDone = result.Entity.IsDone,
             Title = result.Entity.Title
         };
-        todoItemMetrics.ItemCreated(domainObject);
 
         return domainObject;
     }

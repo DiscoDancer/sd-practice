@@ -7,7 +7,6 @@ namespace TodoList.Persistence.Implementations.Metrics;
 
 internal class TodoItemMetrics : ITodoItemMetrics
 {
-    private readonly ItemCreatedAction _itemCreatedAction;
     private readonly ItemUpdatedAction _itemUpdatedAction;
     private readonly ItemRetrievedAction _itemRetrievedAction;
     private readonly ItemDeletedAction _itemDeletedAction;
@@ -17,16 +16,10 @@ internal class TodoItemMetrics : ITodoItemMetrics
     {
         const string namePrefix = "todoList.item";
         var meter = meterFactory.Create("TodoList.App");
-        _itemCreatedAction = new ItemCreatedAction(meter, namePrefix);
         _itemUpdatedAction = new ItemUpdatedAction(meter, namePrefix);
         _itemRetrievedAction = new ItemRetrievedAction(meter, namePrefix);
         _itemDeletedAction = new ItemDeletedAction(meter, namePrefix);
         _itemSearchedByIdAction = new ItemSearchedByIdAction(meter, namePrefix);
-    }
-
-    public void ItemCreated(TodoItem item)
-    {
-        _itemCreatedAction.ItemCreated(item);
     }
 
     public void ItemUpdated(long id, string? title, bool? isDone)
