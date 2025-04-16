@@ -57,6 +57,12 @@ public sealed class TodoItemService(ITodoItemRepository repository) : ITodoItemS
             : Result<TodoDeletedEvent>.Success(new TodoDeletedEvent(DeleteResult.NotDeleted, id));
     }
 
+    public async Task<Result<TodoDeletedAllEvent>> DeleteAllAsync()
+    {
+        var countDeleted = await repository.DeleteAllAsync();
+        return Result<TodoDeletedAllEvent>.Success(new TodoDeletedAllEvent(countDeleted));
+    }
+
     public async Task<Result<TodoAccessedAllEvent>> AccessAllAsync()
     {
         var items = await repository.GetAllAsync();
