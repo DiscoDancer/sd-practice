@@ -44,6 +44,19 @@ public sealed class TodoItemService(ITodoItemRepository repository) : ITodoItemS
         return Result<TodoAccessedEvent>.Success(result == null ? new TodoAccessedEvent(AccessResult.NotFound, id, null) : new TodoAccessedEvent(AccessResult.Found, id, result));
     }
 
+    public async Task<Result<TodoDeletedEvent>> DeleteAsync(long id)
+    {
+        if (id <= 0)
+        {
+            return Result<TodoDeletedEvent>.Failure("Id must be greater than 0");
+        }
+
+        var deleted = await repository.DeleteAsync(id);
+        return deleted
+            ? Result<TodoDeletedEvent>.Success(new TodoDeletedEvent(DeleteResult.Deleted, id))
+            : Result<TodoDeletedEvent>.Success(new TodoDeletedEvent(DeleteResult.NotDeleted, id));
+    }
+
     public async Task<Result<TodoAccessedAllEvent>> AccessAllAsync()
     {
         var items = await repository.GetAllAsync();
