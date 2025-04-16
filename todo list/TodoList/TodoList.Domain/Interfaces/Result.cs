@@ -5,7 +5,7 @@ public sealed class Result<T>
     public bool IsSuccess { get; }
     public bool IsFailure => !IsSuccess;
     public string? Error { get; }
-    public T? Value { get; }
+    public T Value { get; }
 
     public static Result<T> Success(T value)
     {
@@ -14,7 +14,7 @@ public sealed class Result<T>
 
     public static Result<T> Failure(string error)
     {
-        return new Result<T>(false, error, default);
+        return new Result<T>(false, error, default!);
     }
 
     public void Deconstruct(out bool isSuccess, out T? value, out string? error)
@@ -24,7 +24,7 @@ public sealed class Result<T>
         error = Error;
     }
 
-    private Result(bool isSuccess, string? error, T? value)
+    private Result(bool isSuccess, string? error, T value)
     {
         IsSuccess = isSuccess;
         Error = error;

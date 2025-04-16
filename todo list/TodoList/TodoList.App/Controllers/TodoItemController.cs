@@ -16,7 +16,7 @@ public class TodoItemController(ILogger<TodoItemController> logger, ITodoItemSer
     public async Task<ActionResult<TodoItem>> Get(long id)
     {
         var result = await service.AccessAsync(id);
-        if (result.IsFailure || result.Value == null)
+        if (result.IsFailure)
         {
             return BadRequest(result.Error);
         }
@@ -52,7 +52,7 @@ public class TodoItemController(ILogger<TodoItemController> logger, ITodoItemSer
     public async Task<ActionResult<IReadOnlyCollection<TodoItem>>> GetAll()
     {
         var result = await service.AccessAllAsync();
-        if (result.IsFailure || result.Value == null)
+        if (result.IsFailure)
         {
             return BadRequest(result.Error);
         }
@@ -78,7 +78,7 @@ public class TodoItemController(ILogger<TodoItemController> logger, ITodoItemSer
     public async Task<IActionResult> Add(AddInput input)
     {
         var result = await service.AddAsync(input.Title, input.IsDone);
-        if (result.IsFailure || result.Value == null)
+        if (result.IsFailure)
         {
             return BadRequest(result.Error);
         }
@@ -103,7 +103,7 @@ public class TodoItemController(ILogger<TodoItemController> logger, ITodoItemSer
     public async Task<ActionResult> Update(long id, [FromBody] UpdateInput input)
     {
         var result = await service.UpdateAsync(id, input.Title, input.IsDone);
-        if (result.IsFailure || result.Value == null)
+        if (result.IsFailure)
         {
             return BadRequest(result.Error);
         }
@@ -130,7 +130,7 @@ public class TodoItemController(ILogger<TodoItemController> logger, ITodoItemSer
     public async Task<ActionResult> Delete(long id)
     {
         var result = await service.DeleteAsync(id);
-        if (result.IsFailure || result.Value == null)
+        if (result.IsFailure)
         {
             return BadRequest(result.Error);
         }
@@ -150,7 +150,7 @@ public class TodoItemController(ILogger<TodoItemController> logger, ITodoItemSer
     public async Task<ActionResult> DeleteAll()
     {
         var result = await service.DeleteAllAsync();
-        if (result.IsFailure || result.Value == null)
+        if (result.IsFailure)
         {
             return BadRequest(result.Error);
         }
