@@ -16,11 +16,11 @@ public class TodoItemControllerTestsDelete : TodoItemControllerTests
     {
         // Arrange
         const long id = 1;
-        MockService.Setup(service => service.DeleteAsync(id))
+        MockService.Setup(service => service.DeleteAsync(id, TestContext.Current.CancellationToken))
             .ReturnsAsync(Result<TodoDeletedEvent>.Success(new TodoDeletedEvent(deleteResult, id)));
 
         // Act
-        var result = await Controller.Delete(1);
+        var result = await Controller.Delete(1, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeOfType<NoContentResult>();
@@ -34,11 +34,11 @@ public class TodoItemControllerTestsDelete : TodoItemControllerTests
         // Arrange
         const long id = 1;
         const string errorMessage = "FAILURE!!!";
-        MockService.Setup(service => service.DeleteAsync(id))
+        MockService.Setup(service => service.DeleteAsync(id, TestContext.Current.CancellationToken))
             .ReturnsAsync(Result<TodoDeletedEvent>.Failure(errorMessage));
 
         // Act
-        var result = await Controller.Delete(1);
+        var result = await Controller.Delete(1, TestContext.Current.CancellationToken);
 
         // Assert
         var response = result.Should().BeOfType<BadRequestObjectResult>().Subject;

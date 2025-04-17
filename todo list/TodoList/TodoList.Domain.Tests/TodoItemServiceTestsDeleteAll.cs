@@ -13,7 +13,7 @@ public class TodoItemServiceTestsDeleteAll : TodoItemServiceTests
         RepositoryMock.Setup(repo => repo.DeleteAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(deletedCount);
 
         // Act
-        var result = await TodoItemService.DeleteAllAsync();
+        var result = await TodoItemService.DeleteAllAsync(TestContext.Current.CancellationToken);
 
         // Assert
         result.Value.Should().NotBeNull();

@@ -17,7 +17,7 @@ public sealed class TodoItemServiceTestsUpdate : TodoItemServiceTests
         bool? isDone = true;
         RepositoryMock.Setup(repo => repo.UpdateAsync(id, title, isDone, TestContext.Current.CancellationToken)).ReturnsAsync(repositoryResult);
         // Act
-        var result = await TodoItemService.UpdateAsync(id, title, isDone);
+        var result = await TodoItemService.UpdateAsync(id, title, isDone, TestContext.Current.CancellationToken);
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value?.UpdateStatus.Should().Be(expectedStatus);
@@ -31,7 +31,7 @@ public sealed class TodoItemServiceTestsUpdate : TodoItemServiceTests
         const string? title = "";
         bool? isDone = null;
         // Act
-        var result = await TodoItemService.UpdateAsync(id, title, isDone);
+        var result = await TodoItemService.UpdateAsync(id, title, isDone, TestContext.Current.CancellationToken);
         // Assert
         result.IsSuccess.Should().BeFalse();
         result.Error.Should().Be("Title cannot be empty");
@@ -45,7 +45,7 @@ public sealed class TodoItemServiceTestsUpdate : TodoItemServiceTests
         var title = new string('a', 101);
         bool? isDone = null;
         // Act
-        var result = await TodoItemService.UpdateAsync(id, title, isDone);
+        var result = await TodoItemService.UpdateAsync(id, title, isDone, TestContext.Current.CancellationToken);
         // Assert
         result.IsSuccess.Should().BeFalse();
         result.Error.Should().Be("Title cannot be longer than 100 characters");

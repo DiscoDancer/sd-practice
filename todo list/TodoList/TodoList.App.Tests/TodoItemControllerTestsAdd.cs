@@ -15,7 +15,7 @@ public sealed class TodoItemControllerTestsAdd : TodoItemControllerTests
     {
         // Arrange
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
-        MockService.Setup(service => service.AddAsync(todoItem.Title, todoItem.IsDone))
+        MockService.Setup(service => service.AddAsync(todoItem.Title, todoItem.IsDone, TestContext.Current.CancellationToken))
             .ReturnsAsync(Result<TodoCreatedEvent>.Success(new TodoCreatedEvent(todoItem)));
 
         // Act
@@ -23,7 +23,7 @@ public sealed class TodoItemControllerTestsAdd : TodoItemControllerTests
         {
             IsDone = todoItem.IsDone,
             Title = todoItem.Title
-        });
+        }, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeOfType<CreatedAtActionResult>()
@@ -33,7 +33,7 @@ public sealed class TodoItemControllerTestsAdd : TodoItemControllerTests
         MockService.Verify(
             service => service.AddAsync(
                 It.Is<string>(title => title == todoItem.Title),
-                It.Is<bool>(isDone => isDone == todoItem.IsDone)),
+                It.Is<bool>(isDone => isDone == todoItem.IsDone), TestContext.Current.CancellationToken),
             Times.Once);
 
         Logger.Collector.Count.Should().Be(1);
@@ -46,7 +46,7 @@ public sealed class TodoItemControllerTestsAdd : TodoItemControllerTests
         // Arrange
         const string errorMessage = "Failure";
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
-        MockService.Setup(service => service.AddAsync(todoItem.Title, todoItem.IsDone))
+        MockService.Setup(service => service.AddAsync(todoItem.Title, todoItem.IsDone, TestContext.Current.CancellationToken))
             .ReturnsAsync(Result<TodoCreatedEvent>.Failure(errorMessage));
 
         // Act
@@ -54,7 +54,7 @@ public sealed class TodoItemControllerTestsAdd : TodoItemControllerTests
         {
             IsDone = todoItem.IsDone,
             Title = todoItem.Title
-        });
+        }, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeOfType<BadRequestObjectResult>()

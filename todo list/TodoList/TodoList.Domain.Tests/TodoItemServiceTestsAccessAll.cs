@@ -32,7 +32,7 @@ public class TodoItemServiceTestsAccessAll : TodoItemServiceTests
         RepositoryMock.Setup(repo => repo.GetAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(expectedItems);
 
         // Act
-        var result = await todoItemService.AccessAllAsync();
+        var result = await todoItemService.AccessAllAsync(TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

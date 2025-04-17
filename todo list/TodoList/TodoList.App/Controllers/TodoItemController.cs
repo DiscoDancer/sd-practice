@@ -13,9 +13,9 @@ public class TodoItemController(ILogger<TodoItemController> logger, ITodoItemSer
     : ControllerBase
 {
     [HttpGet("{id}")]
-    public async Task<ActionResult<TodoItem>> Get(long id)
+    public async Task<ActionResult<TodoItem>> Get(long id, CancellationToken cancellationToken)
     {
-        var result = await service.AccessAsync(id);
+        var result = await service.AccessAsync(id, cancellationToken);
         if (result.IsFailure)
         {
             return BadRequest(result.Error);
@@ -49,9 +49,9 @@ public class TodoItemController(ILogger<TodoItemController> logger, ITodoItemSer
     }
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyCollection<TodoItem>>> GetAll()
+    public async Task<ActionResult<IReadOnlyCollection<TodoItem>>> GetAll(CancellationToken cancellationToken)
     {
-        var result = await service.AccessAllAsync();
+        var result = await service.AccessAllAsync(cancellationToken);
         if (result.IsFailure)
         {
             return BadRequest(result.Error);
@@ -75,9 +75,9 @@ public class TodoItemController(ILogger<TodoItemController> logger, ITodoItemSer
     }
 
     [HttpPost]
-    public async Task<IActionResult> Add(AddInput input)
+    public async Task<IActionResult> Add(AddInput input, CancellationToken cancellationToken)
     {
-        var result = await service.AddAsync(input.Title, input.IsDone);
+        var result = await service.AddAsync(input.Title, input.IsDone, cancellationToken);
         if (result.IsFailure)
         {
             return BadRequest(result.Error);
@@ -100,9 +100,9 @@ public class TodoItemController(ILogger<TodoItemController> logger, ITodoItemSer
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult> Update(long id, [FromBody] UpdateInput input)
+    public async Task<ActionResult> Update(long id, [FromBody] UpdateInput input, CancellationToken cancellationToken)
     {
-        var result = await service.UpdateAsync(id, input.Title, input.IsDone);
+        var result = await service.UpdateAsync(id, input.Title, input.IsDone, cancellationToken);
         if (result.IsFailure)
         {
             return BadRequest(result.Error);
@@ -127,9 +127,9 @@ public class TodoItemController(ILogger<TodoItemController> logger, ITodoItemSer
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(long id)
+    public async Task<ActionResult> Delete(long id, CancellationToken cancellationToken)
     {
-        var result = await service.DeleteAsync(id);
+        var result = await service.DeleteAsync(id, cancellationToken);
         if (result.IsFailure)
         {
             return BadRequest(result.Error);
@@ -147,9 +147,9 @@ public class TodoItemController(ILogger<TodoItemController> logger, ITodoItemSer
     }
 
     [HttpDelete]
-    public async Task<ActionResult> DeleteAll()
+    public async Task<ActionResult> DeleteAll(CancellationToken cancellationToken)
     {
-        var result = await service.DeleteAllAsync();
+        var result = await service.DeleteAllAsync(cancellationToken);
         if (result.IsFailure)
         {
             return BadRequest(result.Error);

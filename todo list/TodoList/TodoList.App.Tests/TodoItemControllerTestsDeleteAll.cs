@@ -13,10 +13,10 @@ public class TodoItemControllerTestsDeleteAll : TodoItemControllerTests
     public async Task DeleteAllTodoItems_ReturnsNoContentResult_WhenAnyDeleted()
     {
         // Arrange
-        MockService.Setup(service => service.DeleteAllAsync()).ReturnsAsync(Result<TodoDeletedAllEvent>.Success(new TodoDeletedAllEvent(10)));
+        MockService.Setup(service => service.DeleteAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(Result<TodoDeletedAllEvent>.Success(new TodoDeletedAllEvent(10)));
 
         // Act
-        var result = await Controller.DeleteAll();
+        var result = await Controller.DeleteAll(TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeOfType<NoContentResult>();
@@ -28,10 +28,10 @@ public class TodoItemControllerTestsDeleteAll : TodoItemControllerTests
     public async Task DeleteAllTodoItems_ReturnsBadRequest_WhenNothingDeleted()
     {
         // Arrange
-        MockService.Setup(service => service.DeleteAllAsync()).ReturnsAsync(Result<TodoDeletedAllEvent>.Success(new TodoDeletedAllEvent(0)));
+        MockService.Setup(service => service.DeleteAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(Result<TodoDeletedAllEvent>.Success(new TodoDeletedAllEvent(0)));
 
         // Act
-        var result = await Controller.DeleteAll();
+        var result = await Controller.DeleteAll(TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeOfType<BadRequestResult>();
@@ -43,10 +43,10 @@ public class TodoItemControllerTestsDeleteAll : TodoItemControllerTests
     public async Task DeleteAllTodoItems_ReturnsBadRequest_WhenServiceFails()
     {
         // Arrange
-        MockService.Setup(service => service.DeleteAllAsync()).ReturnsAsync(Result<TodoDeletedAllEvent>.Failure("Error"));
+        MockService.Setup(service => service.DeleteAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(Result<TodoDeletedAllEvent>.Failure("Error"));
 
         // Act
-        var result = await Controller.DeleteAll();
+        var result = await Controller.DeleteAll(TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeOfType<BadRequestObjectResult>();

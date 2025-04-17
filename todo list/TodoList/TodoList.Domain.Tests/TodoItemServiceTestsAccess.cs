@@ -22,7 +22,7 @@ public sealed class TodoItemServiceTestsAccess : TodoItemServiceTests
         RepositoryMock.Setup(r => r.GetAsync(id, TestContext.Current.CancellationToken)).ReturnsAsync(todoItem);
 
         // Act
-        var result = await TodoItemService.AccessAsync(id);
+        var result = await TodoItemService.AccessAsync(id, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -40,7 +40,7 @@ public sealed class TodoItemServiceTestsAccess : TodoItemServiceTests
         RepositoryMock.Setup(r => r.GetAsync(id, TestContext.Current.CancellationToken)).ReturnsAsync((TodoItem?)null);
 
         // Act
-        var result = await TodoItemService.AccessAsync(id);
+        var result = await TodoItemService.AccessAsync(id, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

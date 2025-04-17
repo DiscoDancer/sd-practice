@@ -15,7 +15,7 @@ public sealed class TodoItemControllerTestsUpdate : TodoItemControllerTests
     {
         // Arrange
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
-        MockService.Setup(x => x.UpdateAsync(todoItem.Id, todoItem.Title, todoItem.IsDone))
+        MockService.Setup(x => x.UpdateAsync(todoItem.Id, todoItem.Title, todoItem.IsDone, TestContext.Current.CancellationToken))
             .ReturnsAsync(Result<TodoUpdatedEvent>.Success(new TodoUpdatedEvent(UpdateResult.Updated, todoItem.Id, todoItem.Title, todoItem.IsDone)));
 
         // Act
@@ -23,7 +23,7 @@ public sealed class TodoItemControllerTestsUpdate : TodoItemControllerTests
         {
             IsDone = todoItem.IsDone,
             Title = todoItem.Title,
-        });
+        }, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeOfType<NoContentResult>();
@@ -36,14 +36,14 @@ public sealed class TodoItemControllerTestsUpdate : TodoItemControllerTests
     {
         // Arrange
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
-        MockService.Setup(x => x.UpdateAsync(todoItem.Id, todoItem.Title, null))
+        MockService.Setup(x => x.UpdateAsync(todoItem.Id, todoItem.Title, null, TestContext.Current.CancellationToken))
             .ReturnsAsync(Result<TodoUpdatedEvent>.Success(new TodoUpdatedEvent(UpdateResult.Updated, todoItem.Id, todoItem.Title, null)));
 
         // Act
         var result = await Controller.Update(todoItem.Id, new UpdateInput
         {
             Title = todoItem.Title,
-        });
+        }, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeOfType<NoContentResult>();
@@ -56,7 +56,7 @@ public sealed class TodoItemControllerTestsUpdate : TodoItemControllerTests
     {
         // Arrange
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
-        MockService.Setup(x => x.UpdateAsync(todoItem.Id, todoItem.Title, todoItem.IsDone))
+        MockService.Setup(x => x.UpdateAsync(todoItem.Id, todoItem.Title, todoItem.IsDone, TestContext.Current.CancellationToken))
             .ReturnsAsync(Result<TodoUpdatedEvent>.Success(new TodoUpdatedEvent(UpdateResult.NotUpdated, todoItem.Id, todoItem.Title, todoItem.IsDone)));
 
         // Act
@@ -64,7 +64,7 @@ public sealed class TodoItemControllerTestsUpdate : TodoItemControllerTests
         {
             IsDone = todoItem.IsDone,
             Title = todoItem.Title,
-        });
+        }, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeOfType<BadRequestResult>();
@@ -77,7 +77,7 @@ public sealed class TodoItemControllerTestsUpdate : TodoItemControllerTests
     {
         // Arrange
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
-        MockService.Setup(x => x.UpdateAsync(todoItem.Id, todoItem.Title, todoItem.IsDone))
+        MockService.Setup(x => x.UpdateAsync(todoItem.Id, todoItem.Title, todoItem.IsDone, TestContext.Current.CancellationToken))
             .ReturnsAsync(Result<TodoUpdatedEvent>.Failure("Failure!"));
 
         // Act
@@ -85,7 +85,7 @@ public sealed class TodoItemControllerTestsUpdate : TodoItemControllerTests
         {
             IsDone = todoItem.IsDone,
             Title = todoItem.Title,
-        });
+        }, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeOfType<BadRequestObjectResult>();

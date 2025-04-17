@@ -14,10 +14,10 @@ public sealed class TodoItemControllerTestsGet : TodoItemControllerTests
     {
         // Arrange
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
-        MockService.Setup(service => service.AccessAsync(1)).ReturnsAsync(Result<TodoAccessedEvent>.Success(new TodoAccessedEvent(AccessResult.Found, todoItem.Id, todoItem)));
+        MockService.Setup(service => service.AccessAsync(1, TestContext.Current.CancellationToken)).ReturnsAsync(Result<TodoAccessedEvent>.Success(new TodoAccessedEvent(AccessResult.Found, todoItem.Id, todoItem)));
 
         // Act
-        var result = await Controller.Get(1);
+        var result = await Controller.Get(1, TestContext.Current.CancellationToken);
 
         // Assert
         result.Result.Should().BeOfType<OkObjectResult>()
@@ -32,10 +32,10 @@ public sealed class TodoItemControllerTestsGet : TodoItemControllerTests
     public async Task GetTodoItem_ReturnsNotFoundResult_WhenTodoItemNotFound()
     {
         // Arrange
-        MockService.Setup(service => service.AccessAsync(2)).ReturnsAsync(Result<TodoAccessedEvent>.Success(new TodoAccessedEvent(AccessResult.NotFound, 2, null)));
+        MockService.Setup(service => service.AccessAsync(2, TestContext.Current.CancellationToken)).ReturnsAsync(Result<TodoAccessedEvent>.Success(new TodoAccessedEvent(AccessResult.NotFound, 2, null)));
 
         // Act
-        var result = await Controller.Get(2);
+        var result = await Controller.Get(2, TestContext.Current.CancellationToken);
 
         // Assert
         result.Result.Should().BeOfType<NotFoundResult>();
@@ -49,10 +49,10 @@ public sealed class TodoItemControllerTestsGet : TodoItemControllerTests
     {
         // Arrange
         const string errorMessage = "Failure";
-        MockService.Setup(service => service.AccessAsync(1)).ReturnsAsync(Result<TodoAccessedEvent>.Failure(errorMessage));
+        MockService.Setup(service => service.AccessAsync(1, TestContext.Current.CancellationToken)).ReturnsAsync(Result<TodoAccessedEvent>.Failure(errorMessage));
 
         // Act
-        var result = await Controller.Get(1);
+        var result = await Controller.Get(1, TestContext.Current.CancellationToken);
 
         // Assert
         result.Result.Should().BeOfType<BadRequestObjectResult>()

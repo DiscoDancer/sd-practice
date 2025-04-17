@@ -20,10 +20,10 @@ public class TodoItemControllerTestsGetAll : TodoItemControllerTests
         };
 
         var todoAccessedAllEvent = new TodoAccessedAllEvent(todoItems);
-        MockService.Setup(x => x.AccessAllAsync()).ReturnsAsync(Result<TodoAccessedAllEvent>.Success(todoAccessedAllEvent));
+        MockService.Setup(x => x.AccessAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(Result<TodoAccessedAllEvent>.Success(todoAccessedAllEvent));
 
         // Act
-        var result = await Controller.GetAll();
+        var result = await Controller.GetAll(TestContext.Current.CancellationToken);
 
         // Assert
         result.Result.Should().BeOfType<OkObjectResult>()
@@ -38,10 +38,10 @@ public class TodoItemControllerTestsGetAll : TodoItemControllerTests
     public async Task GetTodoItems_ReturnsNotFound_WhenNoTodoItemsExist()
     {
         // Arrange
-        MockService.Setup(x => x.AccessAllAsync()).ReturnsAsync(Result<TodoAccessedAllEvent>.Failure("No items found"));
+        MockService.Setup(x => x.AccessAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(Result<TodoAccessedAllEvent>.Failure("No items found"));
 
         // Act
-        var result = await Controller.GetAll();
+        var result = await Controller.GetAll(TestContext.Current.CancellationToken);
 
         // Assert
         result.Result.Should().BeOfType<BadRequestObjectResult>()
@@ -53,10 +53,10 @@ public class TodoItemControllerTestsGetAll : TodoItemControllerTests
     {
         // Arrange
         var todoAccessedAllEvent = new TodoAccessedAllEvent(new List<TodoItem> { });
-        MockService.Setup(x => x.AccessAllAsync()).ReturnsAsync(Result<TodoAccessedAllEvent>.Success(todoAccessedAllEvent));
+        MockService.Setup(x => x.AccessAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(Result<TodoAccessedAllEvent>.Success(todoAccessedAllEvent));
 
         // Act
-        var result = await Controller.GetAll();
+        var result = await Controller.GetAll(TestContext.Current.CancellationToken);
 
         // Assert
         result.Result.Should().BeOfType<NotFoundResult>();

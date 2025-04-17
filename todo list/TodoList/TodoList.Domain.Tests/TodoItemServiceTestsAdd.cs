@@ -16,7 +16,7 @@ public sealed class TodoItemServiceTestsAdd : TodoItemServiceTests
         RepositoryMock.Setup(repo => repo.AddAsync(title, isDone, TestContext.Current.CancellationToken)).ReturnsAsync(todoItem);
 
         // Act
-        var result = await TodoItemService.AddAsync(title, isDone);
+        var result = await TodoItemService.AddAsync(title, isDone, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -32,7 +32,7 @@ public sealed class TodoItemServiceTestsAdd : TodoItemServiceTests
         const bool isDone = false;
 
         // Act
-        var result = await TodoItemService.AddAsync(title, isDone);
+        var result = await TodoItemService.AddAsync(title, isDone, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeFalse();
@@ -47,7 +47,7 @@ public sealed class TodoItemServiceTestsAdd : TodoItemServiceTests
         const bool isDone = false;
 
         // Act
-        var result = await TodoItemService.AddAsync(title, isDone);
+        var result = await TodoItemService.AddAsync(title, isDone, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeFalse();
