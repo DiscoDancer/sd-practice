@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using TodoList.Domain.Interfaces;
@@ -19,14 +20,12 @@ public sealed class TodoItemControllerTestsGet : TodoItemControllerTests
         var result = await Controller.Get(1);
 
         // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result.Result);
-        var returnValue = Assert.IsType<TodoItem>(okResult.Value);
-        Assert.Equal(todoItem.Id, returnValue.Id);
-        Assert.Equal(todoItem.Title, returnValue.Title);
-        Assert.Equal(todoItem.CreatedAt, returnValue.CreatedAt);
-        Assert.Equal(todoItem.IsDone, returnValue.IsDone);
-        Assert.Equal(1, Logger.Collector.Count);
-        Assert.Equal(LogLevel.Information, Logger.LatestRecord.Level);
+        result.Result.Should().BeOfType<OkObjectResult>()
+            .Which.Value.Should().BeOfType<TodoItem>()
+            .Which.Should().BeEquivalentTo(todoItem);
+
+        Logger.Collector.Count.Should().Be(1);
+        Logger.LatestRecord.Level.Should().Be(LogLevel.Information);
     }
 
     [Fact]
@@ -39,9 +38,10 @@ public sealed class TodoItemControllerTestsGet : TodoItemControllerTests
         var result = await Controller.Get(2);
 
         // Assert
-        Assert.IsType<NotFoundResult>(result.Result);
-        Assert.Equal(1, Logger.Collector.Count);
-        Assert.Equal(LogLevel.Information, Logger.LatestRecord.Level);
+        result.Result.Should().BeOfType<NotFoundResult>();
+
+        Logger.Collector.Count.Should().Be(1);
+        Logger.LatestRecord.Level.Should().Be(LogLevel.Information);
     }
 
     [Fact]
@@ -50,10 +50,12 @@ public sealed class TodoItemControllerTestsGet : TodoItemControllerTests
         // Arrange
         const string errorMessage = "Failure";
         MockService.Setup(service => service.AccessAsync(1)).ReturnsAsync(Result<TodoAccessedEvent>.Failure(errorMessage));
+
         // Act
         var result = await Controller.Get(1);
+
         // Assert
-        var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
-        Assert.Equal(errorMessage, badRequestResult.Value);
+        result.Result.Should().BeOfType<BadRequestObjectResult>()
+            .Which.Value.Should().Be(errorMessage);
     }
 }

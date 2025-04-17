@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using TodoList.Persistence.Implementations;
 using TodoList.Persistence.Implementations.Models;
 using TodoItem = TodoList.Persistence.Implementations.Models.TodoItem;
@@ -27,17 +28,17 @@ public class SqlServerTodoItemRepositoryTests
         var todoItem = await repository.AddAsync("Test", false);
 
         // Assert
-        Assert.NotNull(todoItem);
-        Assert.NotEqual(0, todoItem.Id);
-        Assert.Equal("Test", todoItem.Title);
-        Assert.False(todoItem.IsDone);
+        todoItem.Should().NotBeNull();
+        todoItem.Id.Should().NotBe(0);
+        todoItem.Title.Should().Be("Test");
+        todoItem.IsDone.Should().BeFalse();
 
         var savedTodoItem = await dbContext.TodoItems.FindAsync([todoItem.Id], TestContext.Current.CancellationToken);
-        Assert.NotNull(savedTodoItem);
-        Assert.Equal(todoItem.Id, savedTodoItem.Id);
-        Assert.Equal(todoItem.Title, savedTodoItem.Title);
-        Assert.Equal(todoItem.IsDone, savedTodoItem.IsDone);
-        Assert.Equal(todoItem.CreatedAt, savedTodoItem.CreatedAt);
+        savedTodoItem.Should().NotBeNull();
+        savedTodoItem.Id.Should().Be(todoItem.Id);
+        savedTodoItem.Title.Should().Be(todoItem.Title);
+        savedTodoItem.IsDone.Should().Be(todoItem.IsDone);
+        savedTodoItem.CreatedAt.Should().Be(todoItem.CreatedAt);
     }
 
     [Fact]
@@ -68,11 +69,12 @@ public class SqlServerTodoItemRepositoryTests
 
         // Assert
         var retrievedTodoItem = await dbContext.TodoItems.FindAsync([todoItem.Entity.Id], TestContext.Current.CancellationToken);
-        Assert.NotNull(retrievedTodoItem);
-        Assert.Equal(updatedTodoItem.Id, retrievedTodoItem.Id);
-        Assert.Equal(updatedTodoItem.Title, retrievedTodoItem.Title);
-        Assert.Equal(updatedTodoItem.IsDone, retrievedTodoItem.IsDone);
-        Assert.Equal(updatedTodoItem.CreatedAt, retrievedTodoItem.CreatedAt);
+
+        retrievedTodoItem.Should().NotBeNull();
+        retrievedTodoItem.Id.Should().Be(updatedTodoItem.Id);
+        retrievedTodoItem.Title.Should().Be(updatedTodoItem.Title);
+        retrievedTodoItem.IsDone.Should().Be(updatedTodoItem.IsDone);
+        retrievedTodoItem.CreatedAt.Should().Be(updatedTodoItem.CreatedAt);
     }
 
     [Fact]
@@ -82,10 +84,12 @@ public class SqlServerTodoItemRepositoryTests
         var options = GetInMemoryOptions();
         await using var dbContext = new MasterContext(options);
         var repository = new SqlServerTodoItemRepository(dbContext);
+
         // Act
         var result = await repository.UpdateAsync(999, "Updated Title", true);
+
         // Assert
-        Assert.False(result);
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -107,11 +111,11 @@ public class SqlServerTodoItemRepositoryTests
         var retrievedTodoItem = await repository.GetAsync(todoItem.Entity.Id);
 
         // Assert
-        Assert.NotNull(retrievedTodoItem);
-        Assert.Equal(todoItem.Entity.Id, retrievedTodoItem.Id);
-        Assert.Equal(todoItem.Entity.Title, retrievedTodoItem.Title);
-        Assert.Equal(todoItem.Entity.IsDone, retrievedTodoItem.IsDone);
-        Assert.Equal(todoItem.Entity.CreatedAt, retrievedTodoItem.CreatedAt);
+        retrievedTodoItem.Should().NotBeNull();
+        retrievedTodoItem.Id.Should().Be(todoItem.Entity.Id);
+        retrievedTodoItem.Title.Should().Be(todoItem.Entity.Title);
+        retrievedTodoItem.IsDone.Should().Be(todoItem.Entity.IsDone);
+        retrievedTodoItem.CreatedAt.Should().Be(todoItem.Entity.CreatedAt);
     }
 
     [Fact]
@@ -130,10 +134,10 @@ public class SqlServerTodoItemRepositoryTests
         });
 
         // Act
-        var retrievedTodoItem = await repository.GetAsync(todoItem.Entity.Id+1);
+        var retrievedTodoItem = await repository.GetAsync(todoItem.Entity.Id + 1);
 
         // Assert
-        Assert.Null(retrievedTodoItem);
+        retrievedTodoItem.Should().BeNull();
     }
 
 
@@ -157,9 +161,9 @@ public class SqlServerTodoItemRepositoryTests
         var result = await repository.DeleteAsync(todoItem.Entity.Id);
 
         // Assert
-        Assert.True(result);
+        result.Should().BeTrue();
         var deletedTodoItem = await dbContext.TodoItems.FindAsync([todoItem.Entity.Id], TestContext.Current.CancellationToken);
-        Assert.Null(deletedTodoItem);
+        deletedTodoItem.Should().BeNull();
     }
 
     [Fact]
@@ -175,7 +179,7 @@ public class SqlServerTodoItemRepositoryTests
         var result = await repository.DeleteAsync(id);
 
         // Assert
-        Assert.False(result);
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -200,9 +204,9 @@ public class SqlServerTodoItemRepositoryTests
         var countRemoved = await repository.DeleteAllAsync();
 
         // Assert
+        countRemoved.Should().Be(todoItems.Count);
         var count = await dbContext.TodoItems.CountAsync(TestContext.Current.CancellationToken);
-        Assert.Equal(todoItems.Count, countRemoved);
-        Assert.Equal(0, count);
+        count.Should().Be(0);
     }
 
     [Fact]
@@ -227,11 +231,10 @@ public class SqlServerTodoItemRepositoryTests
         var retrievedTodoItems = await repository.GetAllAsync();
 
         // Assert
-        Assert.NotNull(retrievedTodoItems);
-        Assert.Equal(3, retrievedTodoItems.Count);
-        Assert.Contains(retrievedTodoItems, item => item is { Title: "Test 1", IsDone: false });
-        Assert.Contains(retrievedTodoItems, item => item is { Title: "Test 2", IsDone: true });
-        Assert.Contains(retrievedTodoItems, item => item is { Title: "Test 3", IsDone: false });
+        retrievedTodoItems.Should().NotBeNull();
+        retrievedTodoItems.Should().HaveCount(3);
+        retrievedTodoItems.Should().ContainSingle(item => item.Title == "Test 1" && !item.IsDone);
+        retrievedTodoItems.Should().ContainSingle(item => item.Title == "Test 2" && item.IsDone);
+        retrievedTodoItems.Should().ContainSingle(item => item.Title == "Test 3" && !item.IsDone);
     }
-
 }

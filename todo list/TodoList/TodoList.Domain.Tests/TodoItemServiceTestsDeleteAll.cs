@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using FluentAssertions;
+using Moq;
 
 namespace TodoList.Domain.Tests;
 
@@ -10,12 +11,13 @@ public class TodoItemServiceTestsDeleteAll : TodoItemServiceTests
         // Arrange
         const int deletedCount = 10;
         RepositoryMock.Setup(repo => repo.DeleteAllAsync()).ReturnsAsync(deletedCount);
+
         // Act
         var result = await TodoItemService.DeleteAllAsync();
 
         // Assert
-        Assert.NotNull(result.Value);
-        Assert.True(result.IsSuccess);
-        Assert.Equal(deletedCount, result.Value.Count);
+        result.Value.Should().NotBeNull();
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Count.Should().Be(deletedCount);
     }
 }

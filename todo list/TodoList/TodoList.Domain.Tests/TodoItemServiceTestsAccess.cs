@@ -1,10 +1,11 @@
-﻿using Moq;
+﻿using FluentAssertions;
+using Moq;
 using TodoList.Domain.Interfaces;
 using TodoList.Domain.Interfaces.Events;
 
 namespace TodoList.Domain.Tests;
 
-public sealed class TodoItemServiceTestsAccess: TodoItemServiceTests
+public sealed class TodoItemServiceTestsAccess : TodoItemServiceTests
 {
     [Fact]
     public async Task AccessAsync_ValidId_ReturnsTodoAccessedEvent()
@@ -24,11 +25,11 @@ public sealed class TodoItemServiceTestsAccess: TodoItemServiceTests
         var result = await TodoItemService.AccessAsync(id);
 
         // Assert
-        Assert.True(result.IsSuccess);
-        Assert.NotNull(result.Value);
-        Assert.Equal(AccessResult.Found, result.Value.Result);
-        Assert.Equal(id, result.Value.Id);
-        Assert.Equal(todoItem, result.Value.Item);
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+        result.Value.Result.Should().Be(AccessResult.Found);
+        result.Value.Id.Should().Be(id);
+        result.Value.Item.Should().BeEquivalentTo(todoItem);
     }
 
     [Fact]
@@ -37,13 +38,15 @@ public sealed class TodoItemServiceTestsAccess: TodoItemServiceTests
         // Arrange
         const long id = 1L;
         RepositoryMock.Setup(r => r.GetAsync(id)).ReturnsAsync((TodoItem?)null);
+
         // Act
         var result = await TodoItemService.AccessAsync(id);
+
         // Assert
-        Assert.True(result.IsSuccess);
-        Assert.NotNull(result.Value);
-        Assert.Equal(AccessResult.NotFound, result.Value.Result);
-        Assert.Equal(id, result.Value.Id);
-        Assert.Null(result.Value.Item);
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+        result.Value.Result.Should().Be(AccessResult.NotFound);
+        result.Value.Id.Should().Be(id);
+        result.Value.Item.Should().BeNull();
     }
 }

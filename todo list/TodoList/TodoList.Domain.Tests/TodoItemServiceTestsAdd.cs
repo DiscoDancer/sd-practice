@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using FluentAssertions;
+using Moq;
 using TodoList.Domain.Interfaces;
 
 namespace TodoList.Domain.Tests;
@@ -18,9 +19,9 @@ public sealed class TodoItemServiceTestsAdd : TodoItemServiceTests
         var result = await TodoItemService.AddAsync(title, isDone);
 
         // Assert
-        Assert.True(result.IsSuccess);
-        Assert.NotNull(result.Value);
-        Assert.Equal(todoItem, result.Value.TodoItem);
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+        result.Value.TodoItem.Should().BeEquivalentTo(todoItem);
     }
 
     [Fact]
@@ -29,11 +30,13 @@ public sealed class TodoItemServiceTestsAdd : TodoItemServiceTests
         // Arrange
         const string title = "";
         const bool isDone = false;
+
         // Act
         var result = await TodoItemService.AddAsync(title, isDone);
+
         // Assert
-        Assert.False(result.IsSuccess);
-        Assert.Equal("Title cannot be empty", result.Error);
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Should().Be("Title cannot be empty");
     }
 
     [Fact]
@@ -42,10 +45,12 @@ public sealed class TodoItemServiceTestsAdd : TodoItemServiceTests
         // Arrange
         var title = new string('a', 101);
         const bool isDone = false;
+
         // Act
         var result = await TodoItemService.AddAsync(title, isDone);
+
         // Assert
-        Assert.False(result.IsSuccess);
-        Assert.Equal("Title cannot be longer than 100 characters", result.Error);
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Should().Be("Title cannot be longer than 100 characters");
     }
 }

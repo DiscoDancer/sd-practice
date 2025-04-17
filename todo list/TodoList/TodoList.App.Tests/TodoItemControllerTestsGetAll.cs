@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using TodoList.Domain.Interfaces;
@@ -25,27 +26,14 @@ public class TodoItemControllerTestsGetAll : TodoItemControllerTests
         var result = await Controller.GetAll();
 
         // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result.Result);
-        var returnValue = Assert.IsType<List<TodoItem>>(okResult.Value);
+        result.Result.Should().BeOfType<OkObjectResult>()
+            .Which.Value.Should().BeOfType<List<TodoItem>>()
+            .Which.Should().BeEquivalentTo(todoItems);
 
-        Assert.Collection(returnValue,
-            item =>
-            {
-                Assert.Equal(todoItems[0].Id, item.Id);
-                Assert.Equal(todoItems[0].Title, item.Title);
-                Assert.Equal(todoItems[0].CreatedAt, item.CreatedAt);
-                Assert.Equal(todoItems[0].IsDone, item.IsDone);
-            },
-            item =>
-            {
-                Assert.Equal(todoItems[1].Id, item.Id);
-                Assert.Equal(todoItems[1].Title, item.Title);
-                Assert.Equal(todoItems[1].CreatedAt, item.CreatedAt);
-                Assert.Equal(todoItems[1].IsDone, item.IsDone);
-            });
-        Assert.Equal(1, Logger.Collector.Count);
-        Assert.Equal(LogLevel.Information, Logger.LatestRecord.Level);
+        Logger.Collector.Count.Should().Be(1);
+        Logger.LatestRecord.Level.Should().Be(LogLevel.Information);
     }
+
     [Fact]
     public async Task GetTodoItems_ReturnsNotFound_WhenNoTodoItemsExist()
     {
@@ -56,8 +44,8 @@ public class TodoItemControllerTestsGetAll : TodoItemControllerTests
         var result = await Controller.GetAll();
 
         // Assert
-        var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
-        Assert.Equal("No items found", badRequestResult.Value);
+        result.Result.Should().BeOfType<BadRequestObjectResult>()
+            .Which.Value.Should().Be("No items found");
     }
 
     [Fact]
@@ -71,9 +59,9 @@ public class TodoItemControllerTestsGetAll : TodoItemControllerTests
         var result = await Controller.GetAll();
 
         // Assert
-        Assert.IsType<NotFoundResult>(result.Result);
+        result.Result.Should().BeOfType<NotFoundResult>();
 
-        Assert.Equal(1, Logger.Collector.Count);
-        Assert.Equal(LogLevel.Information, Logger.LatestRecord.Level);
+        Logger.Collector.Count.Should().Be(1);
+        Logger.LatestRecord.Level.Should().Be(LogLevel.Information);
     }
 }

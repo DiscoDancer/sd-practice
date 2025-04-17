@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using TodoList.App.Dtos;
-using TodoList.Domain;
 using TodoList.Domain.Interfaces;
 using TodoList.Domain.Interfaces.Events;
 
 namespace TodoList.App.Tests;
 
-public sealed class TodoItemControllerTestsUpdate: TodoItemControllerTests
+public sealed class TodoItemControllerTestsUpdate : TodoItemControllerTests
 {
     [Fact]
     public async Task UpdateTodoItemFully_ReturnsNoContentResult()
@@ -26,9 +26,9 @@ public sealed class TodoItemControllerTestsUpdate: TodoItemControllerTests
         });
 
         // Assert
-        Assert.IsType<NoContentResult>(result);
-        Assert.Equal(1, Logger.Collector.Count);
-        Assert.Equal(LogLevel.Information, Logger.LatestRecord.Level);
+        result.Should().BeOfType<NoContentResult>();
+        Logger.Collector.Count.Should().Be(1);
+        Logger.LatestRecord.Level.Should().Be(LogLevel.Information);
     }
 
     [Fact]
@@ -46,9 +46,9 @@ public sealed class TodoItemControllerTestsUpdate: TodoItemControllerTests
         });
 
         // Assert
-        Assert.IsType<NoContentResult>(result);
-        Assert.Equal(1, Logger.Collector.Count);
-        Assert.Equal(LogLevel.Information, Logger.LatestRecord.Level);
+        result.Should().BeOfType<NoContentResult>();
+        Logger.Collector.Count.Should().Be(1);
+        Logger.LatestRecord.Level.Should().Be(LogLevel.Information);
     }
 
     [Fact]
@@ -67,9 +67,9 @@ public sealed class TodoItemControllerTestsUpdate: TodoItemControllerTests
         });
 
         // Assert
-        Assert.IsType<BadRequestResult>(result);
-        Assert.Equal(1, Logger.Collector.Count);
-        Assert.Equal(LogLevel.Information, Logger.LatestRecord.Level);
+        result.Should().BeOfType<BadRequestResult>();
+        Logger.Collector.Count.Should().Be(1);
+        Logger.LatestRecord.Level.Should().Be(LogLevel.Information);
     }
 
     [Fact]
@@ -88,6 +88,6 @@ public sealed class TodoItemControllerTestsUpdate: TodoItemControllerTests
         });
 
         // Assert
-        Assert.IsType<BadRequestObjectResult>(result);
+        result.Should().BeOfType<BadRequestObjectResult>();
     }
 }

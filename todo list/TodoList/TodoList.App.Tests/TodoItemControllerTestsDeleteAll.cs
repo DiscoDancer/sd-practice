@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using TodoList.Domain.Interfaces;
@@ -18,9 +19,9 @@ public class TodoItemControllerTestsDeleteAll : TodoItemControllerTests
         var result = await Controller.DeleteAll();
 
         // Assert
-        Assert.IsType<NoContentResult>(result);
-        Assert.Equal(1, Logger.Collector.Count);
-        Assert.Equal(LogLevel.Information, Logger.LatestRecord.Level);
+        result.Should().BeOfType<NoContentResult>();
+        Logger.Collector.Count.Should().Be(1);
+        Logger.LatestRecord.Level.Should().Be(LogLevel.Information);
     }
 
     [Fact]
@@ -33,9 +34,9 @@ public class TodoItemControllerTestsDeleteAll : TodoItemControllerTests
         var result = await Controller.DeleteAll();
 
         // Assert
-        Assert.IsType<BadRequestResult>(result);
-        Assert.Equal(1, Logger.Collector.Count);
-        Assert.Equal(LogLevel.Information, Logger.LatestRecord.Level);
+        result.Should().BeOfType<BadRequestResult>();
+        Logger.Collector.Count.Should().Be(1);
+        Logger.LatestRecord.Level.Should().Be(LogLevel.Information);
     }
 
     [Fact]
@@ -48,6 +49,6 @@ public class TodoItemControllerTestsDeleteAll : TodoItemControllerTests
         var result = await Controller.DeleteAll();
 
         // Assert
-        Assert.IsType<BadRequestObjectResult>(result);
+        result.Should().BeOfType<BadRequestObjectResult>();
     }
 }

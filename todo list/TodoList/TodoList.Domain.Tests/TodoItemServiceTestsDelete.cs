@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using FluentAssertions;
+using Moq;
 using TodoList.Domain.Interfaces.Events;
 
 namespace TodoList.Domain.Tests;
@@ -11,13 +12,15 @@ public class TodoItemServiceTestsDelete : TodoItemServiceTests
         // Arrange
         const long id = 1;
         RepositoryMock.Setup(repo => repo.DeleteAsync(id)).ReturnsAsync(true);
+
         // Act
         var result = await TodoItemService.DeleteAsync(id);
+
         // Assert
-        Assert.NotNull(result.Value);
-        Assert.True(result.IsSuccess);
-        Assert.Equal(DeleteResult.Deleted, result.Value.DeleteResult);
-        Assert.Equal(id, result.Value.Id);
+        result.Value.Should().NotBeNull();
+        result.IsSuccess.Should().BeTrue();
+        result.Value.DeleteResult.Should().Be(DeleteResult.Deleted);
+        result.Value.Id.Should().Be(id);
     }
 
     [Fact]
@@ -26,13 +29,15 @@ public class TodoItemServiceTestsDelete : TodoItemServiceTests
         // Arrange
         const long id = 1;
         RepositoryMock.Setup(repo => repo.DeleteAsync(id)).ReturnsAsync(false);
+
         // Act
         var result = await TodoItemService.DeleteAsync(id);
+
         // Assert
-        Assert.NotNull(result.Value);
-        Assert.True(result.IsSuccess);
-        Assert.Equal(DeleteResult.NotDeleted, result.Value.DeleteResult);
-        Assert.Equal(id, result.Value.Id);
+        result.Value.Should().NotBeNull();
+        result.IsSuccess.Should().BeTrue();
+        result.Value.DeleteResult.Should().Be(DeleteResult.NotDeleted);
+        result.Value.Id.Should().Be(id);
     }
 
     [Fact]
@@ -45,7 +50,7 @@ public class TodoItemServiceTestsDelete : TodoItemServiceTests
         var result = await TodoItemService.DeleteAsync(id);
 
         // Assert
-        Assert.False(result.IsSuccess);
-        Assert.Equal("Id must be greater than 0", result.Error);
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Should().Be("Id must be greater than 0");
     }
 }

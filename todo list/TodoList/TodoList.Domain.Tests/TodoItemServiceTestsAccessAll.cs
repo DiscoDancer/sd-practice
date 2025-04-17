@@ -1,10 +1,11 @@
-﻿using Moq;
+﻿using FluentAssertions;
+using Moq;
 using TodoList.Domain.Implementations;
 using TodoList.Domain.Interfaces;
 
 namespace TodoList.Domain.Tests;
 
-public class TodoItemServiceTestsAccessAll: TodoItemServiceTests
+public class TodoItemServiceTestsAccessAll : TodoItemServiceTests
 {
     [Fact]
     public async Task AccessAllAsync_ShouldReturnTodoAccessedAllEvent_WhenCalled()
@@ -13,14 +14,14 @@ public class TodoItemServiceTestsAccessAll: TodoItemServiceTests
         var todoItemService = new TodoItemService(RepositoryMock.Object);
         var expectedItems = new List<TodoItem>
         {
-            new TodoItem
+            new()
             {
                 Id = 1,
                 CreatedAt = DateTime.UtcNow,
                 Title = "Test Todo 1",
                 IsDone = false
             },
-            new TodoItem
+            new()
             {
                 Id = 2,
                 CreatedAt = DateTime.UtcNow,
@@ -34,13 +35,9 @@ public class TodoItemServiceTestsAccessAll: TodoItemServiceTests
         var result = await todoItemService.AccessAllAsync();
 
         // Assert
-        Assert.True(result.IsSuccess);
-        Assert.NotNull(result.Value);
-        Assert.Equal(expectedItems.Count, result.Value.Items.Count);
-        foreach (var items in result.Value.Items)
-        {
-            var expectedItem = expectedItems.FirstOrDefault(i => i.Id == items.Id);
-            Assert.NotNull(expectedItem);
-        }
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+        result.Value.Items.Should().HaveCount(expectedItems.Count);
+        result.Value.Items.Should().BeEquivalentTo(expectedItems, options => options.Excluding(item => item.CreatedAt));
     }
 }

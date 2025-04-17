@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using FluentAssertions;
+using Moq;
 using TodoList.Domain.Interfaces.Events;
 
 namespace TodoList.Domain.Tests;
@@ -18,8 +19,8 @@ public sealed class TodoItemServiceTestsUpdate : TodoItemServiceTests
         // Act
         var result = await TodoItemService.UpdateAsync(id, title, isDone);
         // Assert
-        Assert.True(result.IsSuccess);
-        Assert.Equal(expectedStatus, result.Value?.UpdateStatus);
+        result.IsSuccess.Should().BeTrue();
+        result.Value?.UpdateStatus.Should().Be(expectedStatus);
     }
 
     [Fact]
@@ -32,8 +33,8 @@ public sealed class TodoItemServiceTestsUpdate : TodoItemServiceTests
         // Act
         var result = await TodoItemService.UpdateAsync(id, title, isDone);
         // Assert
-        Assert.False(result.IsSuccess);
-        Assert.Equal("Title cannot be empty", result.Error);
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Should().Be("Title cannot be empty");
     }
 
     [Fact]
@@ -46,7 +47,7 @@ public sealed class TodoItemServiceTestsUpdate : TodoItemServiceTests
         // Act
         var result = await TodoItemService.UpdateAsync(id, title, isDone);
         // Assert
-        Assert.False(result.IsSuccess);
-        Assert.Equal("Title cannot be longer than 100 characters", result.Error);
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Should().Be("Title cannot be longer than 100 characters");
     }
 }
