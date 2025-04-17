@@ -1,10 +1,10 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Moq;
 using TodoList.App.Dtos;
 using TodoList.Domain.Interfaces;
 using TodoList.Domain.Interfaces.Events;
+using TodoList.Utils;
 
 namespace TodoList.App.Tests;
 
@@ -36,8 +36,7 @@ public sealed class TodoItemControllerTestsAdd : TodoItemControllerTests
                 It.Is<bool>(isDone => isDone == todoItem.IsDone), TestContext.Current.CancellationToken),
             Times.Once);
 
-        Logger.Collector.Count.Should().Be(1);
-        Logger.LatestRecord.Level.Should().Be(LogLevel.Information);
+        Logger.ShouldHaveSingleInfo();
     }
 
     [Fact]
@@ -59,5 +58,6 @@ public sealed class TodoItemControllerTestsAdd : TodoItemControllerTests
         // Assert
         result.Should().BeOfType<BadRequestObjectResult>()
             .Which.Value.Should().Be(errorMessage);
+        Logger.ShouldHaveSingleError(errorMessage);
     }
 }

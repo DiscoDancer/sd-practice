@@ -5,6 +5,7 @@ using Moq;
 using TodoList.App.Dtos;
 using TodoList.Domain.Interfaces;
 using TodoList.Domain.Interfaces.Events;
+using TodoList.Utils;
 
 namespace TodoList.App.Tests;
 
@@ -27,8 +28,7 @@ public sealed class TodoItemControllerTestsUpdate : TodoItemControllerTests
 
         // Assert
         result.Should().BeOfType<NoContentResult>();
-        Logger.Collector.Count.Should().Be(1);
-        Logger.LatestRecord.Level.Should().Be(LogLevel.Information);
+        Logger.ShouldHaveSingleInfo();
     }
 
     [Fact]
@@ -47,8 +47,7 @@ public sealed class TodoItemControllerTestsUpdate : TodoItemControllerTests
 
         // Assert
         result.Should().BeOfType<NoContentResult>();
-        Logger.Collector.Count.Should().Be(1);
-        Logger.LatestRecord.Level.Should().Be(LogLevel.Information);
+        Logger.ShouldHaveSingleInfo();
     }
 
     [Fact]
@@ -68,17 +67,17 @@ public sealed class TodoItemControllerTestsUpdate : TodoItemControllerTests
 
         // Assert
         result.Should().BeOfType<BadRequestResult>();
-        Logger.Collector.Count.Should().Be(1);
-        Logger.LatestRecord.Level.Should().Be(LogLevel.Information);
+        Logger.ShouldHaveSingleInfo();
     }
 
     [Fact]
     public async Task UpdateTodoItem_ReturnsBadRequest_WhenFailure()
     {
         // Arrange
+        const string errorMessage = "Failure";
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
         MockService.Setup(x => x.UpdateAsync(todoItem.Id, todoItem.Title, todoItem.IsDone, TestContext.Current.CancellationToken))
-            .ReturnsAsync(Result<TodoUpdatedEvent>.Failure("Failure!"));
+            .ReturnsAsync(Result<TodoUpdatedEvent>.Failure(errorMessage));
 
         // Act
         var result = await Controller.Update(todoItem.Id, new UpdateInput
@@ -89,5 +88,6 @@ public sealed class TodoItemControllerTestsUpdate : TodoItemControllerTests
 
         // Assert
         result.Should().BeOfType<BadRequestObjectResult>();
+        Logger.ShouldHaveSingleError(errorMessage);
     }
 }

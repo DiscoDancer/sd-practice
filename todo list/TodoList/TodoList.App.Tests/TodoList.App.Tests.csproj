@@ -26,6 +26,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\TodoList.App\TodoList.App.csproj" />
 		<ProjectReference Include="..\TodoList.Domain\TodoList.Domain.csproj" />
+		<ProjectReference Include="..\TodoList.Utils\TodoList.Utils.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

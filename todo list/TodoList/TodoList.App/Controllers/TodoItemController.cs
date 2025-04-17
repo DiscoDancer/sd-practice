@@ -18,6 +18,7 @@ public class TodoItemController(ILogger<TodoItemController> logger, ITodoItemSer
         var result = await service.AccessAsync(id, cancellationToken);
         if (result.IsFailure)
         {
+            logger.LogError(result.Error);
             return BadRequest(result.Error);
         }
 
@@ -54,6 +55,7 @@ public class TodoItemController(ILogger<TodoItemController> logger, ITodoItemSer
         var result = await service.AccessAllAsync(cancellationToken);
         if (result.IsFailure)
         {
+            logger.LogError(result.Error);
             return BadRequest(result.Error);
         }
 
@@ -80,6 +82,7 @@ public class TodoItemController(ILogger<TodoItemController> logger, ITodoItemSer
         var result = await service.AddAsync(input.Title, input.IsDone, cancellationToken);
         if (result.IsFailure)
         {
+            logger.LogError(result.Error);
             return BadRequest(result.Error);
         }
 
@@ -105,6 +108,7 @@ public class TodoItemController(ILogger<TodoItemController> logger, ITodoItemSer
         var result = await service.UpdateAsync(id, input.Title, input.IsDone, cancellationToken);
         if (result.IsFailure)
         {
+            logger.LogError(result.Error);
             return BadRequest(result.Error);
         }
 
@@ -132,6 +136,7 @@ public class TodoItemController(ILogger<TodoItemController> logger, ITodoItemSer
         var result = await service.DeleteAsync(id, cancellationToken);
         if (result.IsFailure)
         {
+            logger.LogError(result.Error);
             return BadRequest(result.Error);
         }
 
@@ -152,6 +157,7 @@ public class TodoItemController(ILogger<TodoItemController> logger, ITodoItemSer
         var result = await service.DeleteAllAsync(cancellationToken);
         if (result.IsFailure)
         {
+            logger.LogError(result.Error);
             return BadRequest(result.Error);
         }
 

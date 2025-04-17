@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using TodoList.Domain.Interfaces;
 using TodoList.Domain.Interfaces.Events;
+using TodoList.Utils;
 
 namespace TodoList.App.Tests;
 
@@ -20,8 +21,7 @@ public class TodoItemControllerTestsDeleteAll : TodoItemControllerTests
 
         // Assert
         result.Should().BeOfType<NoContentResult>();
-        Logger.Collector.Count.Should().Be(1);
-        Logger.LatestRecord.Level.Should().Be(LogLevel.Information);
+        Logger.ShouldHaveSingleInfo();
     }
 
     [Fact]
@@ -35,20 +35,21 @@ public class TodoItemControllerTestsDeleteAll : TodoItemControllerTests
 
         // Assert
         result.Should().BeOfType<BadRequestResult>();
-        Logger.Collector.Count.Should().Be(1);
-        Logger.LatestRecord.Level.Should().Be(LogLevel.Information);
+        Logger.ShouldHaveSingleInfo();
     }
 
     [Fact]
     public async Task DeleteAllTodoItems_ReturnsBadRequest_WhenServiceFails()
     {
         // Arrange
-        MockService.Setup(service => service.DeleteAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(Result<TodoDeletedAllEvent>.Failure("Error"));
+        const string errorMessage = "Failure";
+        MockService.Setup(service => service.DeleteAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(Result<TodoDeletedAllEvent>.Failure(errorMessage));
 
         // Act
         var result = await Controller.DeleteAll(TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeOfType<BadRequestObjectResult>();
+        Logger.ShouldHaveSingleError(errorMessage);
     }
 }

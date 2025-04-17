@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Moq;
 using TodoList.Domain.Interfaces;
 using TodoList.Domain.Interfaces.Events;
+using TodoList.Utils;
 
 namespace TodoList.App.Tests;
 
@@ -30,22 +30,24 @@ public class TodoItemControllerTestsGetAll : TodoItemControllerTests
             .Which.Value.Should().BeOfType<List<TodoItem>>()
             .Which.Should().BeEquivalentTo(todoItems);
 
-        Logger.Collector.Count.Should().Be(1);
-        Logger.LatestRecord.Level.Should().Be(LogLevel.Information);
+        Logger.ShouldHaveSingleInfo();
     }
 
     [Fact]
     public async Task GetTodoItems_ReturnsNotFound_WhenNoTodoItemsExist()
     {
         // Arrange
-        MockService.Setup(x => x.AccessAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(Result<TodoAccessedAllEvent>.Failure("No items found"));
+        const string errorMessage = "No items found";
+        MockService.Setup(x => x.AccessAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(Result<TodoAccessedAllEvent>.Failure(errorMessage));
 
         // Act
         var result = await Controller.GetAll(TestContext.Current.CancellationToken);
 
         // Assert
         result.Result.Should().BeOfType<BadRequestObjectResult>()
-            .Which.Value.Should().Be("No items found");
+            .Which.Value.Should().Be(errorMessage);
+
+        Logger.ShouldHaveSingleError(errorMessage);
     }
 
     [Fact]
@@ -61,7 +63,6 @@ public class TodoItemControllerTestsGetAll : TodoItemControllerTests
         // Assert
         result.Result.Should().BeOfType<NotFoundResult>();
 
-        Logger.Collector.Count.Should().Be(1);
-        Logger.LatestRecord.Level.Should().Be(LogLevel.Information);
+        Logger.ShouldHaveSingleInfo();
     }
 }
