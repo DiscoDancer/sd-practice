@@ -29,7 +29,7 @@ public class TodoItemServiceTestsAccessAll : TodoItemServiceTests
                 IsDone = false
             },
         };
-        RepositoryMock.Setup(repo => repo.GetAllAsync()).ReturnsAsync(expectedItems);
+        RepositoryMock.Setup(repo => repo.GetAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(expectedItems);
 
         // Act
         var result = await todoItemService.AccessAllAsync();

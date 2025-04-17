@@ -7,9 +7,9 @@ namespace TodoList.Persistence.Implementations;
 
 internal sealed class SqlServerTodoItemRepository(MasterContext dbContext) : ITodoItemRepository
 {
-    public async Task<Domain.Interfaces.TodoItem?> GetAsync(long id)
+    public async Task<TodoItem?> GetAsync(long id, CancellationToken cancellationToken = default)
     {
-        var todoItem = await FindByIdOrDefaultAsync(id);
+        var todoItem = await FindByIdOrDefaultAsync(id, cancellationToken);
         if (todoItem is null)
         {
             return null;
@@ -26,9 +26,9 @@ internal sealed class SqlServerTodoItemRepository(MasterContext dbContext) : ITo
         return result;
     }
 
-    public async Task<IReadOnlyCollection<Domain.Interfaces.TodoItem>> GetAllAsync()
+    public async Task<IReadOnlyCollection<TodoItem>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        var todoItems = await dbContext.TodoItems.ToListAsync();
+        var todoItems = await dbContext.TodoItems.ToListAsync(cancellationToken);
 
         var result = todoItems.Select(todoItem => new TodoItem
         {
@@ -41,7 +41,7 @@ internal sealed class SqlServerTodoItemRepository(MasterContext dbContext) : ITo
         return result;
     }
 
-    public async Task<Domain.Interfaces.TodoItem> AddAsync(string title, bool isDone)
+    public async Task<TodoItem> AddAsync(string title, bool isDone, CancellationToken cancellationToken = default)
     {
         var todoItem = new Models.TodoItem
         {
@@ -50,9 +50,9 @@ internal sealed class SqlServerTodoItemRepository(MasterContext dbContext) : ITo
             CreatedAt = DateTime.UtcNow,
         };
 
-        var result = await dbContext.TodoItems.AddAsync(todoItem);
+        var result = await dbContext.TodoItems.AddAsync(todoItem, cancellationToken);
 
-        var changes = await dbContext.SaveChangesAsync();
+        var changes = await dbContext.SaveChangesAsync(cancellationToken);
 
         if (changes == 0)
         {
@@ -70,9 +70,9 @@ internal sealed class SqlServerTodoItemRepository(MasterContext dbContext) : ITo
         return domainObject;
     }
 
-    public async Task<bool> UpdateAsync(long id, string? title, bool? isDone)
+    public async Task<bool> UpdateAsync(long id, string? title, bool? isDone, CancellationToken cancellationToken = default)
     {
-        var todoItem = await FindByIdOrDefaultAsync(id);
+        var todoItem = await FindByIdOrDefaultAsync(id, cancellationToken);
         if (todoItem is null)
         {
             return false;
@@ -87,43 +87,43 @@ internal sealed class SqlServerTodoItemRepository(MasterContext dbContext) : ITo
             todoItem.IsDone = isDone.Value;
         }
 
-        var changes = await dbContext.SaveChangesAsync();
+        var changes = await dbContext.SaveChangesAsync(cancellationToken);
         return changes > 0;
     }
 
-    public async Task<bool> DeleteAsync(long id)
+    public async Task<bool> DeleteAsync(long id, CancellationToken cancellationToken = default)
     {
-        var todoItem = await FindByIdOrDefaultAsync(id);
+        var todoItem = await FindByIdOrDefaultAsync(id, cancellationToken);
         if (todoItem is null)
         {
             return false;
         }
 
         dbContext.TodoItems.Remove(todoItem);
-        var changes = await dbContext.SaveChangesAsync();
+        var changes = await dbContext.SaveChangesAsync(cancellationToken);
 
         var hasBeenDeleted = changes > 0;
 
         return hasBeenDeleted;
     }
 
-    public async Task<int> DeleteAllAsync()
+    public async Task<int> DeleteAllAsync(CancellationToken cancellationToken = default)
     {
-        var todoItems = await dbContext.TodoItems.ToListAsync();
+        var todoItems = await dbContext.TodoItems.ToListAsync(cancellationToken);
         if (!todoItems.Any())
         {
             return 0;
         }
 
         dbContext.TodoItems.RemoveRange(todoItems);
-        var changesCount = await dbContext.SaveChangesAsync();
+        var changesCount = await dbContext.SaveChangesAsync(cancellationToken);
 
         return changesCount;
     }
 
-    private async Task<Models.TodoItem?> FindByIdOrDefaultAsync(long id)
+    private async Task<Models.TodoItem?> FindByIdOrDefaultAsync(long id, CancellationToken cancellationToken = default)
     {
-        var result = await dbContext.TodoItems.FindAsync(id);
+        var result = await dbContext.TodoItems.FindAsync([id], cancellationToken: cancellationToken);
         return result ?? null;
     }
 }

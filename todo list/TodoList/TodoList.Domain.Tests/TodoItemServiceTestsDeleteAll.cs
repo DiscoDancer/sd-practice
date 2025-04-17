@@ -10,7 +10,7 @@ public class TodoItemServiceTestsDeleteAll : TodoItemServiceTests
     {
         // Arrange
         const int deletedCount = 10;
-        RepositoryMock.Setup(repo => repo.DeleteAllAsync()).ReturnsAsync(deletedCount);
+        RepositoryMock.Setup(repo => repo.DeleteAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(deletedCount);
 
         // Act
         var result = await TodoItemService.DeleteAllAsync();

@@ -13,7 +13,7 @@ public sealed class TodoItemServiceTestsAdd : TodoItemServiceTests
         const string title = "Test Todo";
         const bool isDone = false;
         var todoItem = new TodoItem { Title = title, IsDone = isDone, CreatedAt = DateTime.UtcNow, Id = 1 };
-        RepositoryMock.Setup(repo => repo.AddAsync(title, isDone)).ReturnsAsync(todoItem);
+        RepositoryMock.Setup(repo => repo.AddAsync(title, isDone, TestContext.Current.CancellationToken)).ReturnsAsync(todoItem);
 
         // Act
         var result = await TodoItemService.AddAsync(title, isDone);

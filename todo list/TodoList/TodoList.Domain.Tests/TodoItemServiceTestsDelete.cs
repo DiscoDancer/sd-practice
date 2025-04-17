@@ -11,7 +11,7 @@ public class TodoItemServiceTestsDelete : TodoItemServiceTests
     {
         // Arrange
         const long id = 1;
-        RepositoryMock.Setup(repo => repo.DeleteAsync(id)).ReturnsAsync(true);
+        RepositoryMock.Setup(repo => repo.DeleteAsync(id, TestContext.Current.CancellationToken)).ReturnsAsync(true);
 
         // Act
         var result = await TodoItemService.DeleteAsync(id);
@@ -28,7 +28,7 @@ public class TodoItemServiceTestsDelete : TodoItemServiceTests
     {
         // Arrange
         const long id = 1;
-        RepositoryMock.Setup(repo => repo.DeleteAsync(id)).ReturnsAsync(false);
+        RepositoryMock.Setup(repo => repo.DeleteAsync(id, TestContext.Current.CancellationToken)).ReturnsAsync(false);
 
         // Act
         var result = await TodoItemService.DeleteAsync(id);

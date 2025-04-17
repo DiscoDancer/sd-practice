@@ -19,7 +19,7 @@ public sealed class TodoItemServiceTestsAccess : TodoItemServiceTests
             Title = "Test Todo",
             IsDone = false
         };
-        RepositoryMock.Setup(r => r.GetAsync(id)).ReturnsAsync(todoItem);
+        RepositoryMock.Setup(r => r.GetAsync(id, TestContext.Current.CancellationToken)).ReturnsAsync(todoItem);
 
         // Act
         var result = await TodoItemService.AccessAsync(id);
@@ -37,7 +37,7 @@ public sealed class TodoItemServiceTestsAccess : TodoItemServiceTests
     {
         // Arrange
         const long id = 1L;
-        RepositoryMock.Setup(r => r.GetAsync(id)).ReturnsAsync((TodoItem?)null);
+        RepositoryMock.Setup(r => r.GetAsync(id, TestContext.Current.CancellationToken)).ReturnsAsync((TodoItem?)null);
 
         // Act
         var result = await TodoItemService.AccessAsync(id);

@@ -15,7 +15,7 @@ public sealed class TodoItemServiceTestsUpdate : TodoItemServiceTests
         const long id = 1;
         const string? title = "Updated Todo";
         bool? isDone = true;
-        RepositoryMock.Setup(repo => repo.UpdateAsync(id, title, isDone)).ReturnsAsync(repositoryResult);
+        RepositoryMock.Setup(repo => repo.UpdateAsync(id, title, isDone, TestContext.Current.CancellationToken)).ReturnsAsync(repositoryResult);
         // Act
         var result = await TodoItemService.UpdateAsync(id, title, isDone);
         // Assert
