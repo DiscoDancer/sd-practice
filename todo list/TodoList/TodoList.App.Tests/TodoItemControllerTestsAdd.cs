@@ -46,7 +46,7 @@ public sealed class TodoItemControllerTestsAdd : TodoItemControllerTests
         const string errorMessage = "Failure";
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
         MockService.Setup(service => service.AddAsync(todoItem.Title, todoItem.IsDone, TestContext.Current.CancellationToken))
-            .ReturnsAsync(EventResult<TodoCreatedEvent>.Failure(errorMessage));
+            .ReturnsAsync(EventResult<TodoCreatedEvent>.Failure(new ErrorEvent(errorMessage)));
 
         // Act
         var result = await Controller.Add(new AddInput

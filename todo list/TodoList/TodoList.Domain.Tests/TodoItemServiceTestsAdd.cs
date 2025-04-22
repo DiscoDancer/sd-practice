@@ -36,7 +36,7 @@ public sealed class TodoItemServiceTestsAdd : TodoItemServiceTests
 
         // Assert
         result.IsSuccess.Should().BeFalse();
-        result.Error.Should().Be("Title cannot be empty");
+        result.Error.Reason.Should().Be("Title cannot be empty");
     }
 
     [Fact]
@@ -51,6 +51,6 @@ public sealed class TodoItemServiceTestsAdd : TodoItemServiceTests
 
         // Assert
         result.IsSuccess.Should().BeFalse();
-        result.Error.Should().Be("Title cannot be longer than 100 characters");
+        result.Error.Reason.Should().Be("Title cannot be longer than 100 characters");
     }
 }

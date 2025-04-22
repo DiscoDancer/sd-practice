@@ -47,6 +47,6 @@ public sealed class TodoItemServiceTestsAccess : TodoItemServiceTests
         result.Value.Should().NotBeNull();
         result.Value.Result.Should().Be(AccessResult.NotFound);
         result.Value.Id.Should().Be(id);
-        result.Value.Item.Should().BeNull();
+        result.Value.Item.Should().BeEquivalentTo(TodoItem.Default);
     }
 }

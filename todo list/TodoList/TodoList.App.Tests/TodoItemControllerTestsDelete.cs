@@ -34,7 +34,7 @@ public class TodoItemControllerTestsDelete : TodoItemControllerTests
         const long id = 1;
         const string errorMessage = "FAILURE!!!";
         MockService.Setup(service => service.DeleteAsync(id, TestContext.Current.CancellationToken))
-            .ReturnsAsync(EventResult<TodoDeletedEvent>.Failure(errorMessage));
+            .ReturnsAsync(EventResult<TodoDeletedEvent>.Failure(new ErrorEvent(errorMessage)));
 
         // Act
         var result = await Controller.Delete(1, TestContext.Current.CancellationToken);

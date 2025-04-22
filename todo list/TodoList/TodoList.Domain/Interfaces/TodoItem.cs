@@ -28,4 +28,12 @@ public sealed class TodoItem
                && IsDone == other.IsDone
                && CreatedAt == other.CreatedAt;
     }
+
+    public static TodoItem Default => new()
+    {
+        Id = 0,
+        Title = "Default",
+        IsDone = false,
+        CreatedAt = DateTime.MinValue
+    };
 }

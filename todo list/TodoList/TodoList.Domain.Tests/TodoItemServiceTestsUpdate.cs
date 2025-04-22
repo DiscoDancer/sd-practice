@@ -34,7 +34,7 @@ public sealed class TodoItemServiceTestsUpdate : TodoItemServiceTests
         var result = await TodoItemService.UpdateAsync(id, title, isDone, TestContext.Current.CancellationToken);
         // Assert
         result.IsSuccess.Should().BeFalse();
-        result.Error.Should().Be("Title cannot be empty");
+        result.Error.Reason.Should().Be("Title cannot be empty");
     }
 
     [Fact]
@@ -48,6 +48,6 @@ public sealed class TodoItemServiceTestsUpdate : TodoItemServiceTests
         var result = await TodoItemService.UpdateAsync(id, title, isDone, TestContext.Current.CancellationToken);
         // Assert
         result.IsSuccess.Should().BeFalse();
-        result.Error.Should().Be("Title cannot be longer than 100 characters");
+        result.Error.Reason.Should().Be("Title cannot be longer than 100 characters");
     }
 }

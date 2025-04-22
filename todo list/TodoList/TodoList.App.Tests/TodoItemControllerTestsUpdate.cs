@@ -77,7 +77,7 @@ public sealed class TodoItemControllerTestsUpdate : TodoItemControllerTests
         const string errorMessage = "Failure";
         var todoItem = new TodoItem { Id = 1, Title = "FirstItem", CreatedAt = DateTime.UtcNow, IsDone = false };
         MockService.Setup(x => x.UpdateAsync(todoItem.Id, todoItem.Title, todoItem.IsDone, TestContext.Current.CancellationToken))
-            .ReturnsAsync(EventResult<TodoUpdatedEvent>.Failure(errorMessage));
+            .ReturnsAsync(EventResult<TodoUpdatedEvent>.Failure(new ErrorEvent(errorMessage)));
 
         // Act
         var result = await Controller.Update(todoItem.Id, new UpdateInput

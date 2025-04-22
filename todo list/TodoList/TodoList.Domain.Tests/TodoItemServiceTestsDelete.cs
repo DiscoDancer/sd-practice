@@ -51,6 +51,6 @@ public class TodoItemServiceTestsDelete : TodoItemServiceTests
 
         // Assert
         result.IsSuccess.Should().BeFalse();
-        result.Error.Should().Be("Id must be greater than 0");
+        result.Error.Reason.Should().Be("Id must be greater than 0");
     }
 }

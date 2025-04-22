@@ -2,6 +2,8 @@
 
 public sealed class ErrorEvent(string reason) : BaseEvent
 {
+    public string Reason => reason;
+
     protected override IDictionary<string, object?> GetSpecificFields()
     {
         var fields = new Dictionary<string, object?>

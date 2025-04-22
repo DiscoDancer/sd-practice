@@ -38,7 +38,7 @@ public class TodoItemControllerTestsGetAll : TodoItemControllerTests
     {
         // Arrange
         const string errorMessage = "No items found";
-        MockService.Setup(x => x.AccessAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(EventResult<TodoAccessedAllEvent>.Failure(errorMessage));
+        MockService.Setup(x => x.AccessAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(EventResult<TodoAccessedAllEvent>.Failure(new ErrorEvent(errorMessage)));
 
         // Act
         var result = await Controller.GetAll(TestContext.Current.CancellationToken);

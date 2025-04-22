@@ -43,7 +43,7 @@ public class TodoItemControllerTestsDeleteAll : TodoItemControllerTests
     {
         // Arrange
         const string errorMessage = "Failure";
-        MockService.Setup(service => service.DeleteAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(EventResult<TodoDeletedAllEvent>.Failure(errorMessage));
+        MockService.Setup(service => service.DeleteAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(EventResult<TodoDeletedAllEvent>.Failure(new ErrorEvent(errorMessage)));
 
         // Act
         var result = await Controller.DeleteAll(TestContext.Current.CancellationToken);

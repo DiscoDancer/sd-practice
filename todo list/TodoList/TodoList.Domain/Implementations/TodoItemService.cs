@@ -42,7 +42,7 @@ internal sealed class TodoItemService(ITodoItemRepository repository) : ITodoIte
 
         var result = await repository.GetAsync(id, cancellationToken);
 
-        return EventResult<TodoAccessedEvent>.Success(result == null ? new TodoAccessedEvent(AccessResult.NotFound, id, null) : new TodoAccessedEvent(AccessResult.Found, id, result));
+        return EventResult<TodoAccessedEvent>.Success(result == null ? TodoAccessedEvent.NotFound(id) : new TodoAccessedEvent(AccessResult.Found, id, result));
     }
 
     public async Task<EventResult<TodoDeletedEvent>> DeleteAsync(long id, CancellationToken cancellationToken)

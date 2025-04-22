@@ -31,7 +31,7 @@ public sealed class TodoItemControllerTestsGet : TodoItemControllerTests
     public async Task GetTodoItem_ReturnsNotFoundResult_WhenTodoItemNotFound()
     {
         // Arrange
-        MockService.Setup(service => service.AccessAsync(2, TestContext.Current.CancellationToken)).ReturnsAsync(EventResult<TodoAccessedEvent>.Success(new TodoAccessedEvent(AccessResult.NotFound, 2, null)));
+        MockService.Setup(service => service.AccessAsync(2, TestContext.Current.CancellationToken)).ReturnsAsync(EventResult<TodoAccessedEvent>.Success(TodoAccessedEvent.NotFound(2)));
 
         // Act
         var result = await Controller.Get(2, TestContext.Current.CancellationToken);
@@ -47,7 +47,7 @@ public sealed class TodoItemControllerTestsGet : TodoItemControllerTests
     {
         // Arrange
         const string errorMessage = "Failure";
-        MockService.Setup(service => service.AccessAsync(1, TestContext.Current.CancellationToken)).ReturnsAsync(EventResult<TodoAccessedEvent>.Failure(errorMessage));
+        MockService.Setup(service => service.AccessAsync(1, TestContext.Current.CancellationToken)).ReturnsAsync(EventResult<TodoAccessedEvent>.Failure(new ErrorEvent(errorMessage)));
 
         // Act
         var result = await Controller.Get(1, TestContext.Current.CancellationToken);
