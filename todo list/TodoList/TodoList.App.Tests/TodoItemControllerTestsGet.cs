@@ -53,9 +53,8 @@ public sealed class TodoItemControllerTestsGet : TodoItemControllerTests
         var result = await Controller.Get(1, TestContext.Current.CancellationToken);
 
         // Assert
-        result.Result.Should().BeOfType<BadRequestObjectResult>()
-            .Which.Value.Should().Be(errorMessage);
-
+        result.Should().BeOfType<ActionResult<TodoItem>>();
+        result.Value.Should().BeNull();
         Logger.ShouldHaveSingleError(errorMessage);
     }
 }

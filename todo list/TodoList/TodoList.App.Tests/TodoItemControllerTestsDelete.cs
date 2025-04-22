@@ -40,8 +40,9 @@ public class TodoItemControllerTestsDelete : TodoItemControllerTests
         var result = await Controller.Delete(1, TestContext.Current.CancellationToken);
 
         // Assert
-        var response = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-        response.Value.Should().Be(errorMessage);
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var errorEvent = result.As<BadRequestObjectResult>().Value.As<ErrorEvent>();
+        errorEvent.Reason.Should().Be(errorMessage);
         Logger.ShouldHaveSingleError(errorMessage);
     }
 }

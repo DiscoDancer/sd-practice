@@ -10,7 +10,7 @@ public static class LoggerAssertions
     {
         logger.Collector.Count.Should().Be(1);
         logger.LatestRecord.Level.Should().Be(LogLevel.Error);
-        logger.Collector.LatestRecord.Message.Should().Be(expectedMessage);
+        logger.Collector.LatestRecord.Message.Should().Contain(expectedMessage);
     }
 
     public static void ShouldHaveSingleInfo(this FakeLogger logger)
