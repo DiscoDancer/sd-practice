@@ -14,7 +14,7 @@ public class TodoItemControllerTestsDeleteAll : TodoItemControllerTests
     public async Task DeleteAllTodoItems_ReturnsNoContentResult_WhenAnyDeleted()
     {
         // Arrange
-        MockService.Setup(service => service.DeleteAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(Result<TodoDeletedAllEvent>.Success(new TodoDeletedAllEvent(10)));
+        MockService.Setup(service => service.DeleteAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(EventResult<TodoDeletedAllEvent>.Success(new TodoDeletedAllEvent(10)));
 
         // Act
         var result = await Controller.DeleteAll(TestContext.Current.CancellationToken);
@@ -28,7 +28,7 @@ public class TodoItemControllerTestsDeleteAll : TodoItemControllerTests
     public async Task DeleteAllTodoItems_ReturnsBadRequest_WhenNothingDeleted()
     {
         // Arrange
-        MockService.Setup(service => service.DeleteAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(Result<TodoDeletedAllEvent>.Success(new TodoDeletedAllEvent(0)));
+        MockService.Setup(service => service.DeleteAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(EventResult<TodoDeletedAllEvent>.Success(new TodoDeletedAllEvent(0)));
 
         // Act
         var result = await Controller.DeleteAll(TestContext.Current.CancellationToken);
@@ -43,7 +43,7 @@ public class TodoItemControllerTestsDeleteAll : TodoItemControllerTests
     {
         // Arrange
         const string errorMessage = "Failure";
-        MockService.Setup(service => service.DeleteAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(Result<TodoDeletedAllEvent>.Failure(errorMessage));
+        MockService.Setup(service => service.DeleteAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(EventResult<TodoDeletedAllEvent>.Failure(errorMessage));
 
         // Act
         var result = await Controller.DeleteAll(TestContext.Current.CancellationToken);

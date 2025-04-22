@@ -20,7 +20,7 @@ public class TodoItemControllerTestsGetAll : TodoItemControllerTests
         };
 
         var todoAccessedAllEvent = new TodoAccessedAllEvent(todoItems);
-        MockService.Setup(x => x.AccessAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(Result<TodoAccessedAllEvent>.Success(todoAccessedAllEvent));
+        MockService.Setup(x => x.AccessAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(EventResult<TodoAccessedAllEvent>.Success(todoAccessedAllEvent));
 
         // Act
         var result = await Controller.GetAll(TestContext.Current.CancellationToken);
@@ -38,7 +38,7 @@ public class TodoItemControllerTestsGetAll : TodoItemControllerTests
     {
         // Arrange
         const string errorMessage = "No items found";
-        MockService.Setup(x => x.AccessAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(Result<TodoAccessedAllEvent>.Failure(errorMessage));
+        MockService.Setup(x => x.AccessAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(EventResult<TodoAccessedAllEvent>.Failure(errorMessage));
 
         // Act
         var result = await Controller.GetAll(TestContext.Current.CancellationToken);
@@ -55,7 +55,7 @@ public class TodoItemControllerTestsGetAll : TodoItemControllerTests
     {
         // Arrange
         var todoAccessedAllEvent = new TodoAccessedAllEvent(new List<TodoItem> { });
-        MockService.Setup(x => x.AccessAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(Result<TodoAccessedAllEvent>.Success(todoAccessedAllEvent));
+        MockService.Setup(x => x.AccessAllAsync(TestContext.Current.CancellationToken)).ReturnsAsync(EventResult<TodoAccessedAllEvent>.Success(todoAccessedAllEvent));
 
         // Act
         var result = await Controller.GetAll(TestContext.Current.CancellationToken);
