@@ -55,8 +55,11 @@ builder.Host.UseSerilog((context, services, configuration) =>
     ArgumentException.ThrowIfNullOrWhiteSpace(elasticUsername);
     ArgumentException.ThrowIfNullOrWhiteSpace(elasticPassword);
 
+    var containerName = Environment.GetEnvironmentVariable("CONTAINER_ALIAS") ?? Environment.GetEnvironmentVariable("HOSTNAME") ?? Environment.MachineName;
+
     configuration
         .ReadFrom.Configuration(context.Configuration)
+        .Enrich.WithProperty("ContainerAlias", containerName)
         .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(elasticUri))
         {
             // disable cert check, not possible to do in appsettings.json
