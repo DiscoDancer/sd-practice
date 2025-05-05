@@ -1,7 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Serilog;
 using Serilog.Sinks.Elasticsearch;
+using TodoList.App.Dtos;
 using TodoList.App.Middlewares;
 using TodoList.Domain.Interfaces;
 using TodoList.Persistence;
@@ -25,6 +28,10 @@ builder.Services.AddDbContext<MasterContext>(options =>
 builder.Services.RegisterPersistence(builder.Configuration);
 builder.Services.RegisterDomainServices(builder.Configuration);
 
+builder.Services.Configure<OtlpSettings>(builder.Configuration.GetSection("Otlp"));
+var otlpSettings = builder.Configuration.GetSection("Otlp").Get<OtlpSettings>()
+    ?? throw new InvalidOperationException("OtlpSettings is not configured properly.");
+
 
 builder.Services.AddOpenTelemetry()
     .WithMetrics(providerBuilder =>
@@ -32,6 +39,19 @@ builder.Services.AddOpenTelemetry()
         providerBuilder.AddPrometheusExporter();
         providerBuilder.AddRuntimeInstrumentation();
         providerBuilder.AddAspNetCoreInstrumentation();
+    })
+    .WithTracing(providerBuilder =>
+    {
+        providerBuilder
+            .SetResourceBuilder(
+                ResourceBuilder.CreateDefault()
+                    .AddService("TodoApp"))
+            .AddAspNetCoreInstrumentation()
+            .AddEntityFrameworkCoreInstrumentation()
+            .AddOtlpExporter(otlpOptions =>
+            {
+                otlpOptions.Endpoint = new Uri(otlpSettings.Endpoint);
+            });
     });
 
 builder.Host.UseSerilog((context, services, configuration) =>
