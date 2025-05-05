@@ -1,4 +1,3 @@
-using Elastic.Apm.NetCoreAll;
 using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Metrics;
 using Serilog;
@@ -26,8 +25,6 @@ builder.Services.AddDbContext<MasterContext>(options =>
 builder.Services.RegisterPersistence(builder.Configuration);
 builder.Services.RegisterDomainServices(builder.Configuration);
 
-// builder.Services.AddElasticApm();
-
 
 builder.Services.AddOpenTelemetry()
     .WithMetrics(providerBuilder =>
@@ -36,9 +33,6 @@ builder.Services.AddOpenTelemetry()
         providerBuilder.AddRuntimeInstrumentation();
         providerBuilder.AddAspNetCoreInstrumentation();
     });
-
-
-
 
 builder.Host.UseSerilog((context, services, configuration) =>
 {
